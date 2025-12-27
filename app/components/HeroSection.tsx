@@ -2,11 +2,20 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
-import { TextGlitch } from './TextGlitch';
+import { TextGlitch, type TextGlitchHandle } from './TextGlitch';
+
+const roles = [
+  'Software Engineer',
+  'Creative Developer',
+  'UI Engineer',
+  'Fullstack Architect',
+];
 
 export function HeroSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [hasLoaded, setHasLoaded] = useState(false);
+  const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
+  const glitchRef = useRef<TextGlitchHandle>(null);
 
   // Scroll progress for the hero section
   const { scrollYProgress } = useScroll({
@@ -38,6 +47,21 @@ export function HeroSection() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Cycle through roles every 6 seconds
+  useEffect(() => {
+    if (!hasLoaded) return;
+
+    const interval = setInterval(() => {
+      setCurrentRoleIndex((prev) => {
+        const nextIndex = (prev + 1) % roles.length;
+        glitchRef.current?.scrambleTo(roles[nextIndex], true);
+        return nextIndex;
+      });
+    }, 6000);
+
+    return () => clearInterval(interval);
+  }, [hasLoaded]);
+
   return (
     <section
       ref={sectionRef}
@@ -53,8 +77,8 @@ export function HeroSection() {
           animate={{ scale: 1 }}
           transition={{ 
             duration: 1.4,
-            delay: 0.3, // Pause a beat before starting
-            ease: [0.25, 0.1, 0.25, 1] // Slow start, slight bump at end
+            delay: 0.3,
+            ease: [0.25, 0.1, 0.25, 1]
           }}
           style={{ 
             scale: boxScale,
@@ -67,9 +91,9 @@ export function HeroSection() {
             initial={{ scale: 1.8 }}
             animate={{ scale: 1 }}
             transition={{ 
-              duration: 1.8, // Longer than box (1.4s)
-              delay: 0.3, // Same start time
-              ease: [0.25, 0.1, 0.25, 1] // Same easing
+              duration: 1.8,
+              delay: 0.3,
+              ease: [0.25, 0.1, 0.25, 1]
             }}
             className="absolute inset-0 w-full h-full"
           >
@@ -97,65 +121,55 @@ export function HeroSection() {
           />
         </motion.div>
 
-        {/* Hero Typography - CENTERED with increased spacing */}
+        {/* Hero Typography - CENTERED with two lines */}
         <motion.div
           style={{ scale: textScale, opacity: textOpacity }}
           className="absolute inset-0 flex items-center justify-center uppercase"
         >
-          <div className="flex flex-col items-center text-center space-y-8">
+          <div className="flex flex-col items-center text-center gap-6">
+            {/* Line 1: Scramble text */}
             <TextGlitch
               as="h1"
               trigger={hasLoaded}
               duration={1.2}
               speed={0.05}
-              className="text-6xl md:text-7xl lg:text-8xl font-bold"
+              className="text-6xl md:text-7xl lg:text-8xl font-bold text-stone-200"
+              style={{
+                letterSpacing: '0.1em',
+              }}
+            >
+              Hey, I'm Sanskar
+            </TextGlitch>
+
+            {/* Line 2: Glitching role text */}
+            <TextGlitch
+              ref={glitchRef}
+              as="h1"
+              trigger={hasLoaded}
+              duration={0.5}
+              speed={0.03}
+              className="text-5xl md:text-6xl lg:text-7xl font-bold"
               style={{ 
                 color: 'var(--color-stone-200)',
                 letterSpacing: '0.1em'
               }}
             >
-              Hello There
-            </TextGlitch>
-            <TextGlitch
-              as="h1"
-              trigger={hasLoaded}
-              duration={1.2}
-              speed={0.05}
-              className="text-6xl md:text-7xl lg:text-8xl font-bold"
-              style={{ 
-                color: 'var(--color-stone-200)',
-                letterSpacing: '0.1em'
-              }}
-            >
-              I'm Sanskar
-            </TextGlitch>
-            <TextGlitch
-              as="h1"
-              trigger={hasLoaded}
-              duration={1.2}
-              speed={0.05}
-              className="text-6xl md:text-7xl lg:text-8xl font-bold"
-              style={{ 
-                color: 'var(--color-stone-400)',
-                letterSpacing: '0.1em'
-              }}
-            >
-              Software Engineer
+              {roles[0]}
             </TextGlitch>
           </div>
         </motion.div>
 
         {/* Description - LEFT ALIGNED, slides up sequentially */}
         <div className="absolute left-12 top-1/2 -translate-y-1/2 max-w-4xl">
-          <div className="flex flex-col items-start text-left space-y-4">
+          <div className="flex flex-col items-start text-left gap-8">
             {/* Line 1 */}
             <div className="overflow-hidden">
               <motion.p
                 style={{ y: line1Y, opacity: line1Opacity }}
-                className="text-6xl md:text-7xl lg:text-8xl font-light tracking-tight leading-tight"
+                className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-tight"
               >
                 <span style={{ color: 'var(--color-stone-200)' }}>
-                  A software engineer
+                  I turn ideas into interfaces people love using.
                 </span>
               </motion.p>
             </div>
@@ -164,10 +178,10 @@ export function HeroSection() {
             <div className="overflow-hidden">
               <motion.p
                 style={{ y: line2Y, opacity: line2Opacity }}
-                className="text-6xl md:text-7xl lg:text-8xl font-light tracking-tight leading-tight"
+                className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-tight"
               >
                 <span style={{ color: 'var(--color-stone-200)' }}>
-                  blending
+                  Balancing performance, design, and scalability in every build.
                 </span>
               </motion.p>
             </div>
@@ -176,10 +190,10 @@ export function HeroSection() {
             <div className="overflow-hidden">
               <motion.p
                 style={{ y: line3Y, opacity: line3Opacity }}
-                className="text-6xl md:text-7xl lg:text-8xl font-light tracking-tight leading-tight"
+                className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-tight"
               >
                 <span style={{ color: 'var(--color-stone-300)' }}>
-                  creativity and code
+                  Writing code with intention, shipping products with purpose.
                 </span>
               </motion.p>
             </div>

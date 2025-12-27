@@ -68,19 +68,30 @@ export function WorkSection() {
         },
       });
 
+      // Slide the cards straight horizontally from off-screen right to their final position
       tl.fromTo(
         container,
         {
           x: '100vw',
-          y: '100vh',
           opacity: 0,
         },
         {
           x: '0',
-          y: '0',
           opacity: 1,
           ease: 'power2.out',
         }
+      );
+
+      // Smoothly tween the section background from the current color to a dark Tailwind 'stone' color
+      // (approximate hex used for `stone-900`) — synced to the same timeline so the transition follows the scroll
+      tl.to(
+        section,
+        {
+          backgroundColor: '#292524',
+          borderColor: 'rgba(30,28,25,0.3)',
+          ease: 'none',
+        },
+        0
       );
     },
     { scope: sectionRef }
@@ -89,7 +100,7 @@ export function WorkSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-[200vh] overflow-hidden border-t"
+      className="relative h-screen overflow-hidden border-t"
       style={{
         background: '#0a0a0a',
         borderColor: 'rgba(168, 162, 158, 0.3)',
@@ -97,7 +108,7 @@ export function WorkSection() {
     >
       <div className="h-screen relative">
         {/* Title - Aligned Left */}
-        <div className="absolute top-24 left-12 md:left-20 z-10">
+        <div className="absolute top-16 md:top-20 left-12 md:left-20 z-10">
           <TextGlitch
             ref={titleRef}
             trigger={titleTrigger}
@@ -111,10 +122,11 @@ export function WorkSection() {
         {/* Container for Both Cards */}
         <div
           ref={containerRef}
-          className="absolute top-48 md:top-56 left-12 md:left-20 grid grid-cols-2 gap-12 md:gap-20 w-[90vw] max-w-[1400px]"
+          className="absolute top-64 md:top-72 left-12 md:left-20 grid grid-cols-2 gap-20 md:gap-28 w-[90vw] max-w-[1400px] mb-12"
           style={{
             opacity: 0,
-            transform: 'translate(100vw, 100vh)',
+            transform: 'translateX(100vw)',
+            willChange: 'transform',
           }}
         >
           {/* Work Experience 1 */}
@@ -144,7 +156,7 @@ function WorkCard({ experience }: { experience: WorkExperience }) {
   return (
     <div className="relative">
       {/* Period Label */}
-      <div className="mb-4 text-sm tracking-wider text-stone-400 uppercase">
+      <div className="mb-6 text-sm tracking-wider text-stone-400 uppercase">
         {experience.period}
       </div>
 
@@ -164,7 +176,7 @@ function WorkCard({ experience }: { experience: WorkExperience }) {
         </div>
 
         {/* Company Name */}
-        <div className="pb-2 md:pb-4">
+        <div className="pb-3 md:pb-6">
           <h3 className="text-4xl md:text-5xl lg:text-6xl font-bold text-stone-200 tracking-tight whitespace-nowrap">
             {experience.company}
           </h3>
