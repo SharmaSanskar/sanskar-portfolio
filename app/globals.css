@@ -17,6 +17,11 @@
   --color-stone-800: #292524;
   --color-stone-900: #1c1917;
   --color-stone-950: #0c0a09;
+
+  --color-primary: #0a0a0a;
+  --color-text-secondary: #06140F;
+  --color-text-primary: #F4F4ED;
+  --color-accent: #C2A85D;
   
   /* Fonts */
   --font-sans: var(--font-geist-sans);
