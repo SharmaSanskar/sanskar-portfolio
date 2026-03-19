@@ -76,7 +76,7 @@ export function ProjectSection() {
     ScrollTrigger.create({
       trigger: sectionRef.current,
       start: 'top top',
-      end: '+=100%',
+      end: '+=150%',
       pin: true,
       pinSpacing: true,
       onEnter: () => setTitleTrigger(true),
@@ -87,7 +87,7 @@ export function ProjectSection() {
         trigger: sectionRef.current,
         start: 'top top',
         end: '+=100%',
-        scrub: 1,
+        scrub: 0.5,
       },
     });
 
@@ -144,17 +144,13 @@ export function ProjectSection() {
               <div
                 key={`desc-${project.title}`}
                 ref={(el) => { descriptionRefs.current[index] = el; }}
-                className="absolute top-10 left-0 w-full max-w-xl flex flex-col gap-8"
-                style={{ opacity: 0, visibility: 'hidden', transform: 'translateY(-20px)' }}
+                className="absolute top-10 left-0 w-full max-w-xl flex flex-col gap-8 opacity-0 invisible -translate-y-5"
               >
                 {/* SIGNIFICANT GAP BETWEEN INDIVIDUAL POINTS (space-y-12) */}
-                <ul className="flex flex-col gap-2 md:gap-4">
+                <ul className="flex flex-col gap-2 md:gap-4 text-stone-400 text-lg md:text-xl leading-relaxed font-light tracking-wide list-disc list-inside">
                   {project.description.map((point, i) => (
-                    <li key={i} className="flex items-start gap-6 group/item">
-                      <span className="h-[1px] w-8 bg-stone-700 shrink-0 transition-all group-hover/item:w-12 group-hover/item:bg-stone-400" />
-                      <p className="text-stone-400 text-lg md:text-xl leading-relaxed font-light tracking-wide">
-                        {point}
-                      </p>
+                    <li key={i}>
+                      {point}
                     </li>
                   ))}
                 </ul>
@@ -165,7 +161,7 @@ export function ProjectSection() {
                   href={project.githubUrl} 
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 py-1 border-b border-stone-500 text-stone-200 hover:text-white hover:border-white transition-all duration-300 pointer-events-auto group/link"
+                  className="inline-flex items-center h-8 gap-2 border-b border-stone-500 text-stone-200 hover:text-white hover:border-white transition-all duration-300 pointer-events-auto group/link"
                 >
                   <Github size={16} />
                   <span className="text-xs font-bold uppercase tracking-[0.2em]">View Repository</span>
@@ -183,8 +179,7 @@ export function ProjectSection() {
         {/* Right Column - Project List */}
         <div
           ref={containerRef}
-          className="absolute top-16 md:top-20 right-12 md:right-20 w-1/2 h-[calc(100vh-8rem)] flex flex-col justify-start gap-12"
-          style={{ opacity: 0, transform: 'translateX(100vw)' }}
+          className="absolute top-16 md:top-20 right-12 md:right-20 w-1/2 h-[calc(100vh-8rem)] flex flex-col justify-start gap-12 opacity-0 translate-x-[100vw]"
         >
           {projects.map((p, index) => (
             <div key={p.title} className="w-full flex justify-end">

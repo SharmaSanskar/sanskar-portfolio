@@ -48,20 +48,19 @@ export function HeroSection() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Cycle through roles every 6 seconds
+// Cycle through roles every 6 seconds
   useEffect(() => {
     if (!hasLoaded) return;
 
     const interval = setInterval(() => {
-      setCurrentRoleIndex((prev) => {
-        const nextIndex = (prev + 1) % roles.length;
-        glitchRef.current?.scrambleTo(roles[nextIndex], true);
-        return nextIndex;
-      });
+      // ✅ Compute next index independently — don't call scrambleTo inside the state updater
+      const nextIndex = (currentRoleIndex + 1) % roles.length;
+      setCurrentRoleIndex(nextIndex);
+      glitchRef.current?.scrambleTo(roles[nextIndex], true);
     }, 6000);
 
     return () => clearInterval(interval);
-  }, [hasLoaded]);
+  }, [hasLoaded, currentRoleIndex]); // ✅ depend on currentRoleIndex so nextIndex is always fresh
 
   return (
     <section

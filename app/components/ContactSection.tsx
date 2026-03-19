@@ -81,7 +81,7 @@ export function ContactSection() {
             initial={{ opacity: 0, x: -100 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
-            className="space-y-6"
+            className="flex flex-col gap-2"
           >
             {socialLinks.map((link, index) => (
               <motion.a
@@ -133,10 +133,6 @@ export function ContactSection() {
                   value={formData.name}
                   onChange={handleChange}
                   className="p-4 rounded-none border bg-transparent focus:outline-none focus:border-stone-400 transition-colors duration-300"
-                  style={{
-                    borderColor: 'rgba(168, 162, 158, 0.3)',
-                    color: 'var(--color-stone-200)',
-                  }}
                   required
                 />
                 <input
@@ -146,10 +142,6 @@ export function ContactSection() {
                   value={formData.email}
                   onChange={handleChange}
                   className="p-4 rounded-none border bg-transparent focus:outline-none focus:border-stone-400 transition-colors duration-300"
-                  style={{
-                    borderColor: 'rgba(168, 162, 158, 0.3)',
-                    color: 'var(--color-stone-200)',
-                  }}
                   required
                 />
               </div>
@@ -159,21 +151,13 @@ export function ContactSection() {
                 value={formData.message}
                 onChange={handleChange}
                 className="w-full p-4 rounded-none border bg-transparent focus:outline-none focus:border-stone-400 transition-colors duration-300 resize-none h-48"
-                style={{
-                  borderColor: 'rgba(168, 162, 158, 0.3)',
-                  color: 'var(--color-stone-200)',
-                }}
                 required
               />
               <motion.button
                 type="submit"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full p-4 border transition-all duration-300 hover:bg-stone-200 hover:text-black"
-                style={{
-                  borderColor: 'rgba(168, 162, 158, 0.3)',
-                  color: 'var(--color-stone-200)',
-                }}
+                className="w-full border transition-all duration-300 hover:bg-stone-200 hover:text-black"
               >
                 Send Message
               </motion.button>

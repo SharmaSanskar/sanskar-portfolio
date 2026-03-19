@@ -77,8 +77,16 @@ export default function AboutContactSection() {
       .to(about, {
         yPercent: -100,
         duration: 0.33,
-        ease: 'power2.inOut'
-      }, '+=0.1'); // Small pause before curtain lift
+        ease: 'power2.inOut',
+        // ✅ Disable pointer events once about section has fully slid away
+        onComplete: () => {
+          about.style.pointerEvents = 'none';
+        },
+        // ✅ Restore pointer events if user scrolls back up
+        onReverseComplete: () => {
+          about.style.pointerEvents = '';
+        },
+      }, '+=0.1');
 
     return () => {
       tl.kill();
@@ -99,11 +107,7 @@ export default function AboutContactSection() {
         <div className="absolute inset-0 flex items-center justify-center">
           <h1
             ref={headingRef}
-            className="text-7xl md:text-8xl font-bold tracking-tight"
-            style={{
-              color: '#1e3a8a',
-              fontFamily: 'var(--font-geist-sans, system-ui, sans-serif)'
-            }}
+            className="text-7xl md:text-8xl font-bold tracking-tight font-sans text-stone-900"
           >
             Hello <span className="inline-block">
               <span ref={portalRef} className="inline-block">T</span>here :)
@@ -135,9 +139,6 @@ export default function AboutContactSection() {
       {/* CONTACT SECTION - Sits beneath, will be revealed */}
       <div 
         className="absolute inset-0"
-        style={{ 
-          background: 'var(--color-primary-black)',
-        }}
       >
         <ContactSection />
       </div>

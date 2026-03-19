@@ -63,7 +63,7 @@ export function WorkSection() {
       ScrollTrigger.create({
         trigger: section,
         start: 'top top',
-        end: '+=100%',
+        end: '+=150%',
         pin: true,
         pinSpacing: true,
       });
@@ -105,13 +105,11 @@ export function WorkSection() {
         {/* Cards Container */}
         <div
           ref={containerRef}
-          className="absolute top-64 md:top-72 left-12 md:left-20 right-12 md:right-20 grid grid-cols-2 gap-20 md:gap-28"
-          style={{ willChange: 'transform' }}
+          className="absolute top-64 md:top-72 left-12 md:left-20 right-12 md:right-20 grid grid-cols-2 gap-4 md:gap-8 will-change-transform"
         >
           {experiences.map((exp, idx) => (
             <div
               key={exp.company}
-              className={`flex ${idx === 0 ? 'justify-end' : 'justify-start'}`}
               onMouseEnter={() => titleRef.current?.scrambleTo(exp.company, false)}
               onMouseLeave={() => titleRef.current?.scrambleTo()}
             >
@@ -149,11 +147,11 @@ function WorkCard({ experience }: { experience: WorkExperience }) {
 
     if (!isExpanded) {
       gsap.fromTo(detailsRef.current,
-        { opacity: 0, y: 15 },
-        { opacity: 1, y: 0, duration: 0.5, delay: 0.3, ease: "power2.out" }
+        { opacity: 0, y: 60 },
+        { opacity: 1, y: 24, duration: 0.5, delay: 0.3, ease: "power2.out" }
       );
     } else {
-      gsap.to(detailsRef.current, { opacity: 0, y: 10, duration: 0.3 });
+      gsap.to(detailsRef.current, { opacity: 0, y: 60, duration: 0.3 });
     }
   };
 
@@ -195,7 +193,7 @@ function WorkCard({ experience }: { experience: WorkExperience }) {
         </div>
 
         {/* TEXT AREA */}
-        <div className="relative h-48 md:h-64 lg:h-80 flex flex-col justify-end">
+        <div className="relative flex-1 flex flex-col justify-end">
           <div ref={textGroupRef} className="will-change-transform">
             <h3 
               ref={titleRef}
@@ -206,23 +204,14 @@ function WorkCard({ experience }: { experience: WorkExperience }) {
 
             <div
               ref={detailsRef}
-              className="space-y-3 pointer-events-none"
-              style={{ 
-                opacity: 0,
-                position: 'absolute',
-                top: '100%', 
-                left: 0,
-                width: '320px',
-                marginTop: '32px' 
-              }}
+              className="space-y-3 pointer-events-none opacity-0 absolute top-full left-0"
             >
               {experience.details.map((detail, index) => (
-                <div key={index} className="flex items-start gap-3">
-                  <span className="text-stone-600 text-[8px] mt-2">●</span>
-                  <p className="text-sm text-stone-400 leading-relaxed font-light">
+                <ul key={index} className="list-disc text-sm text-stone-400">
+                  <li>
                     {detail}
-                  </p>
-                </div>
+                  </li>
+                </ul>
               ))}
             </div>
           </div>
