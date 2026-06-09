@@ -2,10 +2,8 @@
 
 /* Custom Design Tokens */
 @theme inline {
-  /* Primary Black */
   --color-primary-black: #0a0a0a;
   
-  /* Stone Palette */
   --color-stone-50: #fafaf9;
   --color-stone-100: #f5f5f4;
   --color-stone-200: #e7e5e4;
@@ -18,22 +16,23 @@
   --color-stone-900: #1c1917;
   --color-stone-950: #0c0a09;
 
-  --color-primary: #0a0a0a;
-  --color-text-secondary: #06140F;
   --color-text-primary: #F4F4ED;
   --color-accent: #C2A85D;
-  
-  /* Fonts */
+
+  /* Semantic surface tokens */
+  --color-surface-base: var(--color-stone-900);
+  --color-surface-elevated: var(--color-stone-800);
+
+  /* Semi-transparent border/overlay tokens */
+  --color-border-subtle: rgba(168, 162, 158, 0.15);
+  --color-border-default: rgba(168, 162, 158, 0.3);
+  --color-surface-tint: rgba(168, 162, 158, 0.05);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-/* Base Styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* ✅ Remove the manual * reset — Tailwind preflight handles margin/padding/box-sizing */
 
 html {
   scroll-behavior: smooth;
@@ -46,7 +45,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Smooth scrolling performance */
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;

@@ -125,7 +125,7 @@ export function ProjectSection() {
   }, [activeIndex]);
 
   return (
-    <section ref={sectionRef} className="relative h-screen overflow-hidden bg-[#0a0a0a]">
+    <section ref={sectionRef} className="relative h-screen overflow-hidden bg-primary-black">
       <div className="h-screen relative">
         {/* Left Column - Details */}
         <div className="absolute top-16 md:top-20 left-12 md:left-20 w-1/2 z-10">
@@ -139,7 +139,7 @@ export function ProjectSection() {
           </TextGlitch>
 
           {/* SIGNIFICANT GAP BETWEEN TITLE AND POINTS (mt-80) */}
-          <div className="mt-72 md:mt-80 relative pl-2">
+          <div className="mt-4 md:mt-6 relative pl-2">
             {projects.map((project, index) => (
               <div
                 key={`desc-${project.title}`}
@@ -199,7 +199,7 @@ export function ProjectSection() {
                   </h3>
                 </div>
 
-                <div className={`w-48 h-32 md:w-64 md:h-40 flex items-center justify-center border flex-shrink-0 relative cursor-pointer bg-stone-900 overflow-hidden transition-all duration-500 ${activeIndex === index ? 'border-stone-200 shadow-[0_0_30px_rgba(255,255,255,0.05)]' : 'border-stone-500/20'}`}>
+                <div className={`w-48 h-32 md:w-64 md:h-40 flex items-center justify-center border flex-shrink-0 relative cursor-pointer bg-stone-900 overflow-hidden transition-[border-color,box-shadow] duration-500 ${activeIndex === index ? 'border-stone-200 shadow-[0_0_30px_rgba(255,255,255,0.05)]' : 'border-stone-500/20'}`}>
                   <img 
                     src={p.image} 
                     alt={p.title}

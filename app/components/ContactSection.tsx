@@ -5,7 +5,11 @@ import { Mail, Github, BookOpen, Twitter, Linkedin } from 'lucide-react';
 import { motion } from 'motion/react';
 import emailjs from '@emailjs/browser';
 
-export function ContactSection() {
+interface ContactSectionProps {
+  isRevealed?: boolean;
+}
+
+export function ContactSection({ isRevealed = true }: ContactSectionProps) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -79,9 +83,9 @@ export function ContactSection() {
           {/* Left Column - Social Links */}
           <motion.div
             initial={{ opacity: 0, x: -100 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
-            className="flex flex-col gap-2"
+            animate={isRevealed ? { opacity: 1, x: 0 } : { opacity: 0, x: -100 }}
+            transition={{ duration: 0.5, ease: 'easeOut', delay: 0.1 }}
+            className="flex flex-col gap-3"
           >
             {socialLinks.map((link, index) => (
               <motion.a
@@ -89,21 +93,21 @@ export function ContactSection() {
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, x: -30 }}
+                animate={isRevealed ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
                 transition={{
-                  duration: 0.6,
+                  duration: 0.35,
                   ease: 'easeOut',
-                  delay: 0.4 + index * 0.1,
+                  delay: 0.15 + index * 0.05,
                 }}
                 whileHover={{ x: 10 }}
-                className="flex items-center gap-4 group"
+                className="flex items-center gap-4 group w-fit"
               >
                 <div
                   className="w-12 h-12 rounded-full flex items-center justify-center border transition-all duration-300 group-hover:scale-110"
                   style={{
-                    borderColor: 'rgba(168, 162, 158, 0.3)',
-                    background: 'rgba(168, 162, 158, 0.05)',
+                    borderColor: 'var(--color-border-default)',
+                    background: 'var(--color-surface-tint)',
                   }}
                 >
                   <link.icon size={20} style={{ color: 'var(--color-stone-200)' }} />
@@ -121,10 +125,10 @@ export function ContactSection() {
           {/* Right Column - Contact Form */}
           <motion.div
             initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
+            animate={isRevealed ? { opacity: 1, x: 0 } : { opacity: 0, x: 100 }}
             transition={{ duration: 0.8, ease: 'easeOut', delay: 0.3 }}
           >
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <input
                   type="text"
@@ -132,7 +136,7 @@ export function ContactSection() {
                   placeholder="Name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="p-4 rounded-none border bg-transparent focus:outline-none focus:border-stone-400 transition-colors duration-300"
+                  className="p-4 rounded-none border border-stone-600 bg-stone-900/40 text-stone-200 placeholder:text-stone-500 focus:outline-none focus:border-stone-400 transition-colors duration-300"
                   required
                 />
                 <input
@@ -141,7 +145,7 @@ export function ContactSection() {
                   placeholder="Email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="p-4 rounded-none border bg-transparent focus:outline-none focus:border-stone-400 transition-colors duration-300"
+                  className="p-4 rounded-none border border-stone-600 bg-stone-900/40 text-stone-200 placeholder:text-stone-500 focus:outline-none focus:border-stone-400 transition-colors duration-300"
                   required
                 />
               </div>
@@ -150,14 +154,14 @@ export function ContactSection() {
                 placeholder="Message"
                 value={formData.message}
                 onChange={handleChange}
-                className="w-full p-4 rounded-none border bg-transparent focus:outline-none focus:border-stone-400 transition-colors duration-300 resize-none h-48"
+                className="w-full p-4 rounded-none border border-stone-600 bg-stone-900/40 text-stone-200 placeholder:text-stone-500 focus:outline-none focus:border-stone-400 transition-colors duration-300 resize-none h-48"
                 required
               />
               <motion.button
                 type="submit"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full border transition-all duration-300 hover:bg-stone-200 hover:text-black"
+                className="w-full p-4 border border-stone-600 bg-stone-800 text-stone-200 transition-all duration-300 hover:bg-stone-200 hover:text-black"
               >
                 Send Message
               </motion.button>
@@ -179,9 +183,9 @@ export function ContactSection() {
       {/* Bottom - Big Text */}
       <motion.div
         initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
+        animate={isRevealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
         transition={{ duration: 1, ease: 'easeOut', delay: 0.5 }}
-        className="pb-12 md:pb-16 text-center"
+        className="pb-6 md:pb-8 text-center"
       >
         <h2
           className="text-7xl md:text-8xl lg:text-9xl font-bold tracking-tighter"

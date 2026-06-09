@@ -3,21 +3,21 @@
 import { MeshGradient } from '@paper-design/shaders-react';
 
 interface PaperShaderProps {
-  colors?: string[];
+  colors?: readonly string[];
   speed?: number;
   className?: string;
 }
 
-export function PaperShader({ 
+export function PaperShader({
   colors = ['#0a0a0a', '#1c1917', '#292524', '#44403c'],
   speed = 0.5,
-  className = '' 
+  className = ''
 }: PaperShaderProps) {
   return (
-    <div className={`absolute inset-0 w-full h-full bg-primary ${className}`}>
+    <div className={`absolute inset-0 w-full h-full bg-primary-black ${className}`}>
       <MeshGradient
         className="w-full h-full"
-        colors={colors}
+        colors={[...colors]}
         speed={speed}
       />
     </div>

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { TextGlitch, type TextGlitchHandle } from './TextGlitch';
 import { PaperShader } from './PaperShader';
+import { shaderColors } from '@/app/constants/colors';
 
 const roles = [
   'Software Engineer',
@@ -65,7 +66,7 @@ export function HeroSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative h-[400vh] bg-primary"
+      className="relative h-[400vh] bg-primary-black"
     >
       {/* Sticky container for the hero content */}
       <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
@@ -86,8 +87,8 @@ export function HeroSection() {
           className="relative w-[50vw] h-[60vh] overflow-hidden"
         >
           {/* PaperShader - the expanding element */}
-          <PaperShader 
-            colors={['#0a0a0a', '#1c1917', '#292524', '#57534e']}
+          <PaperShader
+            colors={shaderColors.bg}
             speed={0.3}
           />
 
