@@ -5,6 +5,7 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { TextGlitch, type TextGlitchHandle } from './TextGlitch';
+import { COLORS } from '@/app/constants/colors';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -82,20 +83,20 @@ export function WorkSection() {
         { x: 0, opacity: 1, ease: 'none' }
       );
 
-      tl.to(section, { backgroundColor: '#0a0a0a', ease: 'none' }, 0);
+      tl.to(section, { backgroundColor: COLORS.page, ease: 'none' }, 0);
     },
     { scope: sectionRef }
   );
 
   return (
-    <section ref={sectionRef} className="relative h-screen overflow-hidden bg-[#292524]">
+    <section ref={sectionRef} className="relative h-screen overflow-hidden bg-surface">
       <div className="h-screen relative">
         {/* WORK Title */}
         <div className="absolute top-16 md:top-20 left-12 md:left-20 z-10">
           <TextGlitch
             ref={titleRef}
             trigger={titleTrigger}
-            className="text-8xl md:text-9xl font-bold tracking-tighter text-stone-200"
+            className="type-display text-heading"
             as="h2"
           >
             WORK
@@ -157,7 +158,7 @@ function WorkCard({ experience }: { experience: WorkExperience }) {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-sm tracking-wider text-stone-500 uppercase">
+      <div className="type-label text-muted">
         {experience.period}
       </div>
 
@@ -165,7 +166,7 @@ function WorkCard({ experience }: { experience: WorkExperience }) {
         {/* LOGO BOX */}
         <div
           ref={logoBoxRef}
-          className="w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 flex items-center justify-center border flex-shrink-0 relative cursor-pointer bg-[#0a0a0a] border-stone-500/40 overflow-hidden"
+          className="w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 flex items-center justify-center border flex-shrink-0 relative cursor-pointer bg-page border-edge/40 overflow-hidden"
           onClick={handleLogoClick}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
@@ -179,14 +180,14 @@ function WorkCard({ experience }: { experience: WorkExperience }) {
               }`}
             />
           ) : (
-            <div className="text-5xl md:text-6xl text-stone-700 font-bold">
+            <div className="text-5xl md:text-6xl text-dim font-bold">
               {experience.company.charAt(0)}
             </div>
           )}
 
           {/* View Details Overlay */}
-          <div className={`absolute inset-0 z-10 flex items-center justify-center bg-stone-950/80 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-            <span className="text-xs tracking-widest text-stone-300 uppercase font-medium">
+          <div className={`absolute inset-0 z-10 flex items-center justify-center bg-overlay transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+            <span className="type-overlay text-heading">
               {isExpanded ? 'Close' : 'View Details'}
             </span>
           </div>
@@ -197,7 +198,7 @@ function WorkCard({ experience }: { experience: WorkExperience }) {
           <div ref={textGroupRef} className="will-change-transform">
             <h3 
               ref={titleRef}
-              className="text-3xl md:text-4xl lg:text-5xl font-bold text-stone-200 tracking-tight whitespace-nowrap leading-none"
+              className="type-section-heading text-heading whitespace-nowrap"
             >
               {experience.company}
             </h3>
@@ -207,7 +208,7 @@ function WorkCard({ experience }: { experience: WorkExperience }) {
               className="space-y-3 pointer-events-none opacity-0 absolute top-full left-0"
             >
               {experience.details.map((detail, index) => (
-                <ul key={index} className="list-disc text-sm text-stone-400">
+                <ul key={index} className="list-disc text-sm text-secondary">
                   <li>
                     {detail}
                   </li>

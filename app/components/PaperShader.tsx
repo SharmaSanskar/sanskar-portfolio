@@ -14,7 +14,7 @@ export function PaperShader({
   className = ''
 }: PaperShaderProps) {
   return (
-    <div className={`absolute inset-0 w-full h-full bg-primary-black ${className}`}>
+    <div className={`absolute inset-0 w-full h-full bg-page ${className}`}>
       <MeshGradient
         className="w-full h-full"
         colors={[...colors]}

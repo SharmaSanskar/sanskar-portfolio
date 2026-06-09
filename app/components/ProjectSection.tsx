@@ -125,14 +125,14 @@ export function ProjectSection() {
   }, [activeIndex]);
 
   return (
-    <section ref={sectionRef} className="relative h-screen overflow-hidden bg-primary-black">
+    <section ref={sectionRef} className="relative h-screen overflow-hidden bg-page">
       <div className="h-screen relative">
         {/* Left Column - Details */}
         <div className="absolute top-16 md:top-20 left-12 md:left-20 w-1/2 z-10">
           <TextGlitch
             ref={titleRef}
             trigger={titleTrigger}
-            className="text-8xl md:text-9xl font-bold tracking-tighter text-stone-200"
+            className="type-display text-heading"
             as="h2"
           >
             PROJECTS
@@ -147,7 +147,7 @@ export function ProjectSection() {
                 className="absolute top-10 left-0 w-full max-w-xl flex flex-col gap-8 opacity-0 invisible -translate-y-5"
               >
                 {/* SIGNIFICANT GAP BETWEEN INDIVIDUAL POINTS (space-y-12) */}
-                <ul className="flex flex-col gap-2 md:gap-4 text-stone-400 text-lg md:text-xl leading-relaxed font-light tracking-wide list-disc list-inside">
+                <ul className="type-list text-secondary flex flex-col gap-2 md:gap-4 list-disc list-inside">
                   {project.description.map((point, i) => (
                     <li key={i}>
                       {point}
@@ -161,10 +161,10 @@ export function ProjectSection() {
                   href={project.githubUrl} 
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center h-8 gap-2 border-b border-stone-500 text-stone-200 hover:text-white hover:border-white transition-all duration-300 pointer-events-auto group/link"
+                  className="inline-flex items-center h-8 gap-2 border-b border-edge text-heading hover:border-edge-strong transition-all duration-300 pointer-events-auto group/link"
                 >
                   <Github size={16} />
-                  <span className="text-xs font-bold uppercase tracking-[0.2em]">View Repository</span>
+                  <span className="type-label">View Repository</span>
                   <ArrowUpRight 
                     size={14} 
                     className="transition-transform group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5" 
@@ -191,15 +191,15 @@ export function ProjectSection() {
                 onClick={() => setActiveIndex(prev => (prev === index ? null : index))}
               >
                 <div className="flex flex-col items-end mb-2">
-                   <span className="text-[10px] font-mono text-stone-600 mb-1">
+                   <span className="type-index text-muted mb-1">
                      {String(index + 1).padStart(2, '0')}
                    </span>
-                   <h3 className={`text-lg font-medium transition-colors duration-300 tracking-tight ${hoveredIndex === index || activeIndex === index ? 'text-stone-100' : 'text-stone-500'}`}>
+                   <h3 className={`text-lg font-medium transition-colors duration-300 tracking-tight ${hoveredIndex === index || activeIndex === index ? 'text-heading' : 'text-muted'}`}>
                     {p.title}
                   </h3>
                 </div>
 
-                <div className={`w-48 h-32 md:w-64 md:h-40 flex items-center justify-center border flex-shrink-0 relative cursor-pointer bg-stone-900 overflow-hidden transition-[border-color,box-shadow] duration-500 ${activeIndex === index ? 'border-stone-200 shadow-[0_0_30px_rgba(255,255,255,0.05)]' : 'border-stone-500/20'}`}>
+                <div className={`w-48 h-32 md:w-64 md:h-40 flex items-center justify-center border flex-shrink-0 relative cursor-pointer bg-surface overflow-hidden transition-[border-color,box-shadow] duration-500 ${activeIndex === index ? 'border-edge-strong shadow-[0_0_30px_rgba(255,255,255,0.05)]' : 'border-edge-subtle'}`}>
                   <img 
                     src={p.image} 
                     alt={p.title}
@@ -208,8 +208,8 @@ export function ProjectSection() {
                     }`}
                   />
                   
-                  <div className={`absolute inset-0 z-10 flex items-center justify-center bg-stone-950/80 transition-opacity duration-300 ${hoveredIndex === index ? 'opacity-100' : 'opacity-0'}`}>
-                    <span className="text-[10px] tracking-[0.4em] text-stone-100 uppercase font-bold">
+                  <div className={`absolute inset-0 z-10 flex items-center justify-center bg-overlay transition-opacity duration-300 ${hoveredIndex === index ? 'opacity-100' : 'opacity-0'}`}>
+                    <span className="type-overlay text-heading">
                       {activeIndex === index ? 'Close' : 'View Details'}
                     </span>
                   </div>

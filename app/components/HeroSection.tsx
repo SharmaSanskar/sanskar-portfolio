@@ -66,7 +66,7 @@ export function HeroSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative h-[400vh] bg-primary-black"
+      className="relative h-[400vh] bg-page"
     >
       {/* Sticky container for the hero content */}
       <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
@@ -93,12 +93,9 @@ export function HeroSection() {
           />
 
           {/* Subtle border */}
-          <motion.div 
-            className="absolute inset-0 border opacity-20 pointer-events-none z-10"
-            style={{ 
-              borderColor: 'var(--color-stone-600)',
-              borderRadius: boxBorderRadius,
-            }}
+          <motion.div
+            className="absolute inset-0 border border-edge-subtle opacity-20 pointer-events-none z-10"
+            style={{ borderRadius: boxBorderRadius }}
           />
         </motion.div>
 
@@ -114,10 +111,8 @@ export function HeroSection() {
               trigger={hasLoaded}
               duration={1.2}
               speed={0.05}
-              className="text-6xl md:text-7xl lg:text-8xl font-bold text-stone-200"
-              style={{
-                letterSpacing: '0.1em',
-              }}
+              className="text-6xl md:text-7xl lg:text-8xl type-hero text-heading"
+              style={{ letterSpacing: '0.1em' }}
             >
               Hey, I'm Sanskar
             </TextGlitch>
@@ -129,10 +124,8 @@ export function HeroSection() {
               trigger={hasLoaded}
               duration={0.5}
               speed={0.03}
-              className="text-5xl md:text-6xl lg:text-7xl font-bold text-stone-200"
-              style={{ 
-                letterSpacing: '0.1em'
-              }}
+              className="text-5xl md:text-6xl lg:text-7xl type-hero text-heading"
+              style={{ letterSpacing: '0.1em' }}
             >
               {roles[0]}
             </TextGlitch>
@@ -146,9 +139,9 @@ export function HeroSection() {
             <div className="overflow-hidden">
               <motion.p
                 style={{ y: line1Y, opacity: line1Opacity }}
-                className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-tight"
+                className="text-4xl md:text-5xl lg:text-6xl type-statement"
               >
-                <span className='text-stone-200'>
+                <span className='text-heading'>
                   I turn ideas into interfaces people love using.
                 </span>
               </motion.p>
@@ -158,9 +151,9 @@ export function HeroSection() {
             <div className="overflow-hidden">
               <motion.p
                 style={{ y: line2Y, opacity: line2Opacity }}
-                className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-tight"
+                className="text-4xl md:text-5xl lg:text-6xl type-statement"
               >
-                <span className='text-stone-200'>
+                <span className='text-heading'>
                   Balancing performance, design, and scalability in every build.
                 </span>
               </motion.p>
@@ -170,9 +163,9 @@ export function HeroSection() {
             <div className="overflow-hidden">
               <motion.p
                 style={{ y: line3Y, opacity: line3Opacity }}
-                className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-tight"
+                className="text-4xl md:text-5xl lg:text-6xl type-statement"
               >
-                <span className='text-stone-200'>
+                <span className='text-heading'>
                   Writing code with intention, shipping products with purpose.
                 </span>
               </motion.p>

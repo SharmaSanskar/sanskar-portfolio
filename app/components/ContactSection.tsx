@@ -106,15 +106,14 @@ export function ContactSection({ isRevealed = true }: ContactSectionProps) {
                 <div
                   className="w-12 h-12 rounded-full flex items-center justify-center border transition-all duration-300 group-hover:scale-110"
                   style={{
-                    borderColor: 'var(--color-border-default)',
-                    background: 'var(--color-surface-tint)',
+                    borderColor: 'var(--color-edge)',
+                    background: 'var(--color-input-bg)',
                   }}
                 >
-                  <link.icon size={20} style={{ color: 'var(--color-stone-200)' }} />
+                  <link.icon size={20} style={{ color: 'var(--color-heading)' }} />
                 </div>
                 <span
-                  className="text-lg md:text-xl transition-colors duration-300 group-hover:opacity-70"
-                  style={{ color: 'var(--color-stone-200)' }}
+                  className="text-lg md:text-xl text-heading transition-colors duration-300 group-hover:opacity-70"
                 >
                   {link.text}
                 </span>
@@ -136,7 +135,7 @@ export function ContactSection({ isRevealed = true }: ContactSectionProps) {
                   placeholder="Name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="p-4 rounded-none border border-stone-600 bg-stone-900/40 text-stone-200 placeholder:text-stone-500 focus:outline-none focus:border-stone-400 transition-colors duration-300"
+                  className="p-4 rounded-none border border-edge bg-input-bg text-heading placeholder:text-muted focus:outline-none focus:border-edge-strong transition-colors duration-300"
                   required
                 />
                 <input
@@ -145,7 +144,7 @@ export function ContactSection({ isRevealed = true }: ContactSectionProps) {
                   placeholder="Email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="p-4 rounded-none border border-stone-600 bg-stone-900/40 text-stone-200 placeholder:text-stone-500 focus:outline-none focus:border-stone-400 transition-colors duration-300"
+                  className="p-4 rounded-none border border-edge bg-input-bg text-heading placeholder:text-muted focus:outline-none focus:border-edge-strong transition-colors duration-300"
                   required
                 />
               </div>
@@ -154,14 +153,14 @@ export function ContactSection({ isRevealed = true }: ContactSectionProps) {
                 placeholder="Message"
                 value={formData.message}
                 onChange={handleChange}
-                className="w-full p-4 rounded-none border border-stone-600 bg-stone-900/40 text-stone-200 placeholder:text-stone-500 focus:outline-none focus:border-stone-400 transition-colors duration-300 resize-none h-48"
+                className="w-full p-4 rounded-none border border-edge bg-input-bg text-heading placeholder:text-muted focus:outline-none focus:border-edge-strong transition-colors duration-300 resize-none h-48"
                 required
               />
               <motion.button
                 type="submit"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full p-4 border border-stone-600 bg-stone-800 text-stone-200 transition-all duration-300 hover:bg-stone-200 hover:text-black"
+                className="w-full p-4 border border-edge bg-surface text-heading transition-all duration-300 hover:bg-reveal hover:text-heading-inv"
               >
                 Send Message
               </motion.button>
@@ -170,7 +169,7 @@ export function ContactSection({ isRevealed = true }: ContactSectionProps) {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="text-sm text-center"
-                  style={{ color: 'var(--color-stone-400)' }}
+                  style={{ color: 'var(--color-muted)' }}
                 >
                   {status}
                 </motion.p>
@@ -188,8 +187,7 @@ export function ContactSection({ isRevealed = true }: ContactSectionProps) {
         className="pb-6 md:pb-8 text-center"
       >
         <h2
-          className="text-7xl md:text-8xl lg:text-9xl font-bold tracking-tighter"
-          style={{ color: 'var(--color-stone-200)' }}
+          className="type-display text-heading"
         >
           LET'S CONNECT
         </h2>

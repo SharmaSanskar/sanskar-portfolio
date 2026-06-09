@@ -94,13 +94,13 @@ export default function AboutContactSection() {
       {/* ABOUT SECTION */}
       <div
         ref={aboutRef}
-        className="absolute inset-0 z-10 bg-stone-900 overflow-hidden"
+        className="absolute inset-0 z-10 bg-section overflow-hidden"
       >
         {/* Initial Greeting */}
         <div className="absolute inset-0 flex items-center justify-center">
           <h1
             ref={headingRef}
-            className="text-7xl md:text-8xl font-bold tracking-tight font-sans text-stone-200"
+            className="type-greeting text-heading"
           >
             Hello <span className="inline-block">
               <span ref={portalRef} className="inline-block">T</span>here :)
@@ -111,11 +111,11 @@ export default function AboutContactSection() {
         {/* About Content */}
         <div
           ref={aboutContentRef}
-          className="absolute inset-0 flex flex-col justify-center px-10 md:px-20 gap-12 md:gap-16 bg-stone-200"
+          className="absolute inset-0 flex flex-col justify-center px-10 md:px-20 gap-12 md:gap-16 bg-reveal"
         >
           {/* Top — Main Statement */}
           <h2
-            className="text-4xl md:text-6xl font-light tracking-tight leading-tight text-center text-stone-900"
+            className="type-statement text-4xl md:text-6xl text-center text-heading-inv"
           >
             I build scalable software that turns complex problems into simple, reliable products.
           </h2>
@@ -128,7 +128,7 @@ export default function AboutContactSection() {
               {/* Image 1 — starts higher */}
               <div
                 className="w-1/2 aspect-[3/4] overflow-hidden flex-shrink-0"
-                style={{ border: '1px solid var(--color-border-subtle)' }}
+                style={{ border: '1px solid var(--color-edge-subtle)' }}
               >
                 <img
                   src="/about/photo1.jpg"
@@ -139,7 +139,7 @@ export default function AboutContactSection() {
               {/* Image 2 — offset down */}
               <div
                 className="w-1/2 aspect-[3/4] overflow-hidden flex-shrink-0 mt-10"
-                style={{ border: '1px solid var(--color-border-subtle)' }}
+                style={{ border: '1px solid var(--color-edge-subtle)' }}
               >
                 <img
                   src="/about/photo2.jpg"
@@ -152,16 +152,16 @@ export default function AboutContactSection() {
             {/* Right — Two indented paragraphs */}
             <div className="flex flex-col gap-8">
               <p
-                className="text-base md:text-lg leading-relaxed"
-                style={{ color: 'var(--color-stone-700)', textIndent: '3rem' }}
+                className="type-body text-body-inv"
+                style={{ textIndent: '3rem' }}
               >
                 I'm Sanskar Sharma, a CS grad student at Northeastern University. I like
                 building products end-to-end—taking an idea, stressing it, breaking it,
                 and then making it solid.
               </p>
               <p
-                className="text-base md:text-lg leading-relaxed"
-                style={{ color: 'var(--color-stone-700)', textIndent: '3rem' }}
+                className="type-body text-body-inv"
+                style={{ textIndent: '3rem' }}
               >
                 Most of my time goes into writing code, fixing things I thought were already
                 fixed, and chasing that one bug that refuses to exist when I look at it. When
@@ -174,7 +174,7 @@ export default function AboutContactSection() {
       </div>
 
       {/* CONTACT SECTION */}
-      <div className="absolute inset-0 bg-primary-black">
+      <div className="absolute inset-0 bg-page">
         <ContactSection isRevealed={contactRevealed} />
       </div>
     </div>
