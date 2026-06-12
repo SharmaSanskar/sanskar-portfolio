@@ -17,6 +17,7 @@ export function HeroSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
+  const [isDark, setIsDark] = useState(true);
   const glitchRef = useRef<TextGlitchHandle>(null);
 
   // Scroll progress for the hero section
@@ -42,6 +43,14 @@ export function HeroSection() {
   
   const line3Opacity = useTransform(scrollYProgress, [0.6, 0.7], [0, 1]);
   const line3Y = useTransform(scrollYProgress, [0.6, 0.7], [50, 0]);
+
+  useEffect(() => {
+    const update = () => setIsDark(document.documentElement.dataset.theme !== 'light');
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     // Trigger entry animation after mount
@@ -88,7 +97,7 @@ export function HeroSection() {
         >
           {/* PaperShader - the expanding element */}
           <PaperShader
-            colors={shaderColors.bg}
+            colors={isDark ? shaderColors.dark : shaderColors.light}
             speed={0.3}
           />
 

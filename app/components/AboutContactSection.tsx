@@ -133,7 +133,7 @@ export default function AboutContactSection() {
                 <img
                   src="/about/photo1.jpg"
                   alt="Sanskar"
-                  className="w-full h-full object-cover grayscale"
+                  className="w-full h-full object-cover"
                 />
               </div>
               {/* Image 2 — offset down */}
@@ -144,7 +144,7 @@ export default function AboutContactSection() {
                 <img
                   src="/about/photo2.jpg"
                   alt="Sanskar"
-                  className="w-full h-full object-cover grayscale"
+                  className="w-full h-full object-cover"
                 />
               </div>
             </div>

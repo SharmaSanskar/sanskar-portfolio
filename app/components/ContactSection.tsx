@@ -104,7 +104,7 @@ export function ContactSection({ isRevealed = true }: ContactSectionProps) {
                 className="flex items-center gap-4 group w-fit"
               >
                 <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center border transition-all duration-300 group-hover:scale-110"
+                  className="w-12 h-12 flex items-center justify-center border transition-all duration-300 group-hover:scale-110"
                   style={{
                     borderColor: 'var(--color-edge)',
                     background: 'var(--color-input-bg)',
@@ -184,10 +184,11 @@ export function ContactSection({ isRevealed = true }: ContactSectionProps) {
         initial={{ opacity: 0, y: 50 }}
         animate={isRevealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
         transition={{ duration: 1, ease: 'easeOut', delay: 0.5 }}
-        className="pb-6 md:pb-8 text-center"
+        className="pb-3 md:pb-4 text-center"
       >
         <h2
-          className="type-display text-heading"
+          className="font-bold text-heading leading-none tracking-[0.15em] whitespace-nowrap"
+          style={{ fontSize: 'clamp(4rem, 8vw, 14rem)' }}
         >
           LET'S CONNECT
         </h2>
