@@ -13,6 +13,7 @@ gsap.registerPlugin(ScrollTrigger);
 interface Project {
   title: string;
   description: string[];
+  tech: string[];
   githubUrl: string;
   image: string;
 }
@@ -25,8 +26,9 @@ const projects: Project[] = [
       'Trained a Support Vector Classifier (SVC) and processed data from 500+ student profiles for model evaluation.',
       'Built a Keras-based neural network to provide personalized university recommendations based on user profiles.'
     ],
+    tech: ['React.js', 'FastAPI', 'scikit-learn', 'Keras'],
     githubUrl: 'https://github.com/SharmaSanskar/ml-gradhelp',
-    image: '/projects/gradhelp.png', 
+    image: '/projects/gradhelp.png',
   },
   {
     title: 'CryptoPlace',
@@ -35,6 +37,7 @@ const projects: Project[] = [
       'Designed an NLP pipeline for real-time sentiment analysis of 50+ cryptocurrencies using the Twitter API.',
       'Integrated a Flask and Redis backend to handle high-frequency data processing and real-time dashboard updates.'
     ],
+    tech: ['Next.js', 'Flask', 'Redis', 'LSTM'],
     githubUrl: 'https://github.com/SharmaSanskar/nextjs-cryptoplace',
     image: '/projects/cryptoplace.png',
   },
@@ -45,6 +48,7 @@ const projects: Project[] = [
       'Integrated Firebase for real-time data management and low-latency peer-to-peer communication.',
       'Optimized Node.js backend to achieve 90% connection reliability for seamless, high-quality video calls.'
     ],
+    tech: ['React', 'WebRTC', 'Firebase', 'Node.js'],
     githubUrl: 'https://github.com/SharmaSanskar/react-concord-videochat',
     image: '/projects/concord.png',
   },
@@ -138,6 +142,27 @@ export function ProjectSection() {
             PROJECTS
           </TextGlitch>
 
+          {/* Tech tags — appear below the glitch title on hover/active */}
+          {(() => {
+            const displayIndex = hoveredIndex ?? activeIndex;
+            const show = displayIndex !== null;
+            return (
+              <div
+                style={{
+                  maxHeight: show ? '20px' : '0px',
+                  opacity: show ? 1 : 0,
+                  overflow: 'hidden',
+                  marginTop: show ? '12px' : '0px',
+                  transition: 'max-height 0.28s ease, opacity 0.22s ease, margin-top 0.28s ease',
+                }}
+              >
+                <p className="text-[13px] font-medium uppercase tracking-[0.35em] text-muted">
+                  {show ? projects[displayIndex!].tech.join(' • ') : ''}
+                </p>
+              </div>
+            );
+          })()}
+
           {/* SIGNIFICANT GAP BETWEEN TITLE AND POINTS (mt-80) */}
           <div className="mt-4 md:mt-6 relative pl-2">
             {projects.map((project, index) => (
@@ -191,10 +216,10 @@ export function ProjectSection() {
                 onClick={() => setActiveIndex(prev => (prev === index ? null : index))}
               >
                 <div className="flex flex-col items-end mb-2">
-                   <span className="type-index text-muted mb-1">
-                     {String(index + 1).padStart(2, '0')}
-                   </span>
-                   <h3 className={`text-lg font-medium transition-colors duration-300 tracking-tight ${hoveredIndex === index || activeIndex === index ? 'text-heading' : 'text-muted'}`}>
+                  <span className="type-index text-muted mb-1">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <h3 className={`text-lg font-medium transition-colors duration-300 tracking-tight ${hoveredIndex === index || activeIndex === index ? 'text-heading' : 'text-muted'}`}>
                     {p.title}
                   </h3>
                 </div>
