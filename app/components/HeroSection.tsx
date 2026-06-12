@@ -15,12 +15,12 @@ const roles = [
 
 // Marquee items — two identical copies for seamless -50% loop
 const MARQUEE_ITEMS = [
-  'Software Engineer',
-  'Creative Developer',
-  'Full Stack',
-  'Open to Work',
-  'UI Engineer',
-  'Fullstack Architect',
+  'Always Shipping',
+  'Zero to Deployed',
+  'Pixel Perfect',
+  'Style Has Opinions',
+  'Curious by Default',
+  'Types Over Prayers',
 ];
 
 // Build [item, ·, item, ·, ...] with a trailing · so copies tile seamlessly
@@ -190,7 +190,12 @@ export function HeroSection() {
            * pr-8 == gap-8, so the trailing space of set-1 equals the gap within each set,
            * making the seam at -50% translateX perfectly equidistant.
            */}
-          <div className="flex items-center" style={{ width: 'max-content', animation: 'marquee 28s linear infinite', willChange: 'transform' }}>
+          <motion.div
+            animate={{ x: ['0%', '-50%'] }}
+            transition={{ duration: 28, ease: 'linear', repeat: Infinity, repeatType: 'loop' }}
+            className="flex items-center"
+            style={{ width: 'max-content' }}
+          >
             {/* Set 1 */}
             <div className="flex items-center gap-8 pr-8 flex-shrink-0">
               {MARQUEE_SET.map((item, i) =>
@@ -223,7 +228,7 @@ export function HeroSection() {
                 )
               )}
             </div>
-          </div>
+          </motion.div>
         </motion.div>
 
       </div>

@@ -156,7 +156,7 @@ export function ProjectSection() {
                   transition: 'max-height 0.28s ease, opacity 0.22s ease, margin-top 0.28s ease',
                 }}
               >
-                <p className="text-[13px] font-medium uppercase tracking-[0.35em] text-muted">
+                <p className="text-sm font-medium uppercase tracking-[0.3em] text-muted">
                   {show ? projects[displayIndex!].tech.join(' • ') : ''}
                 </p>
               </div>
