@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
+import Link from 'next/link';
 import { TextGlitch, type TextGlitchHandle } from './TextGlitch';
 import { PaperShader } from './PaperShader';
 import { shaderColors } from '@/app/constants/colors';
@@ -13,7 +14,6 @@ const roles = [
   'Fullstack Architect',
 ];
 
-// Marquee items — two identical copies for seamless -50% loop
 const MARQUEE_ITEMS = [
   'Always Shipping',
   'Zero to Deployed',
@@ -23,7 +23,6 @@ const MARQUEE_ITEMS = [
   'Types Over Prayers',
 ];
 
-// Build [item, ·, item, ·, ...] with a trailing · so copies tile seamlessly
 const MARQUEE_SET = MARQUEE_ITEMS.flatMap(item => [
   { type: 'text', value: item },
   { type: 'sep',  value: '·' },
@@ -32,37 +31,35 @@ const MARQUEE_SET = MARQUEE_ITEMS.flatMap(item => [
 export function HeroSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [hasLoaded, setHasLoaded] = useState(false);
+  // Step 4 trigger — fires when role + buttons become visible (~1.95s)
+  const [roleVisible, setRoleVisible] = useState(false);
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
   const [isDark, setIsDark] = useState(true);
   const glitchRef = useRef<TextGlitchHandle>(null);
 
-  // Scroll progress for the hero section
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start start', 'end start'],
   });
 
-  // Box scale: expands to fill viewport edge-to-edge
+  // Shader scroll scale: expands to fill viewport
   const boxScale = useTransform(scrollYProgress, [0, 0.4], [1, 3.5]);
   const boxBorderRadius = useTransform(scrollYProgress, [0, 0.4], [16, 0]);
 
-  // Hero text transformations on scroll - faster fade
-  const textScale = useTransform(scrollYProgress, [0, 0.25], [1, 0.6]);
+  // All hero foreground fades out early on scroll
   const textOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
 
-  // Description lines animate in sequentially
+  // Description lines
   const line1Opacity = useTransform(scrollYProgress, [0.4, 0.5], [0, 1]);
-  const line1Y = useTransform(scrollYProgress, [0.4, 0.5], [50, 0]);
-
+  const line1Y      = useTransform(scrollYProgress, [0.4, 0.5], [50, 0]);
   const line2Opacity = useTransform(scrollYProgress, [0.5, 0.6], [0, 1]);
-  const line2Y = useTransform(scrollYProgress, [0.5, 0.6], [50, 0]);
-
+  const line2Y      = useTransform(scrollYProgress, [0.5, 0.6], [50, 0]);
   const line3Opacity = useTransform(scrollYProgress, [0.6, 0.7], [0, 1]);
-  const line3Y = useTransform(scrollYProgress, [0.6, 0.7], [50, 0]);
+  const line3Y      = useTransform(scrollYProgress, [0.6, 0.7], [50, 0]);
 
-  // Marquee: appears after the description lines, floats up from bottom
+  // Marquee
   const marqueeOpacity = useTransform(scrollYProgress, [0.74, 0.86], [0, 1]);
-  const marqueeY = useTransform(scrollYProgress, [0.74, 0.86], [24, 0]);
+  const marqueeY       = useTransform(scrollYProgress, [0.74, 0.86], [24, 0]);
 
   useEffect(() => {
     const update = () => setIsDark(document.documentElement.dataset.theme !== 'light');
@@ -73,8 +70,11 @@ export function HeroSection() {
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => setHasLoaded(true), 100);
-    return () => clearTimeout(timer);
+    // Step 1 & 2 kickoff — mark loaded after brief delay
+    const t1 = setTimeout(() => setHasLoaded(true), 100);
+    // Step 4 — role + buttons become visible at ~1.9s
+    const t2 = setTimeout(() => setRoleVisible(true), 2400);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
   useEffect(() => {
@@ -88,61 +88,191 @@ export function HeroSection() {
   }, [hasLoaded, currentRoleIndex]);
 
   return (
-    // Increased to 500vh to give room for the marquee phase after the description
     <section ref={sectionRef} className="relative h-[500vh] bg-page">
-
-      {/* Sticky container */}
       <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
 
-        {/* ── Shader box ── */}
+        {/* ── Step 1: EMERGE — ghost background, first to appear ── */}
         <motion.div
-          initial={{ scale: 1.5 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 1.4, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-          style={{ scale: boxScale, borderRadius: boxBorderRadius }}
-          className="relative w-[50vw] h-[60vh] overflow-hidden"
+          style={{ opacity: textOpacity }}
+          className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0"
+          aria-hidden="true"
         >
-          <PaperShader
-            colors={isDark ? shaderColors.dark : shaderColors.light}
-            speed={0.3}
-          />
-          <motion.div
-            className="absolute inset-0 border border-edge-subtle opacity-20 pointer-events-none z-10"
-            style={{ borderRadius: boxBorderRadius }}
-          />
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.06 }}
+            transition={{ duration: 0.7, ease: 'easeOut' }}
+            className="font-bold text-heading whitespace-nowrap"
+            style={{ fontSize: '23vw', letterSpacing: '0.04em', lineHeight: 1 }}
+          >
+            EMERGE
+          </motion.span>
         </motion.div>
 
-        {/* ── Hero typography (fades out on scroll) ── */}
+        {/* ── Step 2: Shader box — grows from zero after EMERGE appears ── */}
+        {/*   Outer wrapper drives the entrance scale 0→1                  */}
+        {/*   Inner wrapper drives the scroll scale 1→3.5                  */}
         <motion.div
-          style={{ scale: textScale, opacity: textOpacity }}
-          className="absolute inset-0 flex items-center justify-center uppercase z-20"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 1.4, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="relative"
         >
-          <div className="flex flex-col items-center text-center gap-6">
-            <TextGlitch
-              as="h1"
-              trigger={hasLoaded}
-              duration={1.2}
-              speed={0.05}
-              className="text-6xl md:text-7xl lg:text-8xl type-hero text-heading"
-              style={{ letterSpacing: '0.1em' }}
+          <motion.div
+            style={{ scale: boxScale, borderRadius: boxBorderRadius }}
+            className="relative w-[50vw] h-[60vh] overflow-hidden z-10"
+          >
+            <PaperShader
+              colors={isDark ? shaderColors.dark : shaderColors.light}
+              speed={0.3}
+            />
+
+            {/* ── Step 3: Shader content — appears after box is fully grown ── */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.45, delay: 1.95 }}
+              className="absolute inset-0 z-20 pointer-events-none"
             >
-              Hey, I'm Sanskar
-            </TextGlitch>
+              <motion.div
+                style={{ opacity: textOpacity }}
+                className="absolute inset-0"
+              >
+                {/* Quote — top left */}
+                <div className="absolute top-5 left-5 max-w-[50%]">
+                  <p
+                    className="text-heading leading-relaxed"
+                    style={{ fontSize: '11px', letterSpacing: '0.03em', opacity: 0.5 }}
+                  >
+                    Quiet creator, bringing ideas to life,<br />
+                    through motion, detail and softness
+                  </p>
+                </div>
+
+                {/* Name — bottom right: SHARMA brighter + larger, SANSKAR dimmer + smaller */}
+                <div className="absolute bottom-4 right-5 flex flex-col items-end">
+                  <span
+                    className="font-bold text-heading leading-[0.88]"
+                    style={{ fontSize: 'clamp(2.8rem, 5.2vw, 6rem)', opacity: 0.52 }}
+                  >
+                    SANSKAR
+                  </span>
+                  <span
+                    className="font-bold text-heading leading-[0.88]"
+                    style={{ fontSize: 'clamp(3.8rem, 7.5vw, 9rem)', opacity: 0.88 }}
+                  >
+                    SHARMA
+                  </span>
+                </div>
+              </motion.div>
+            </motion.div>
+
+            <motion.div
+              className="absolute inset-0 border border-edge-subtle opacity-20 pointer-events-none z-10"
+              style={{ borderRadius: boxBorderRadius }}
+            />
+          </motion.div>
+        </motion.div>
+
+        {/* ── Step 4a: Corner markers — outside shader box, at its exact corners ── */}
+        {/*   Shader is 50vw × 60vh centered → corners at (25vw,20vh) and (75vw,80vh) */}
+        <motion.div
+          style={{ opacity: textOpacity }}
+          className="absolute inset-0 pointer-events-none z-20"
+          aria-hidden="true"
+        >
+          {/* Top-left corner */}
+          <motion.div
+            className="absolute"
+            style={{ top: 'calc(20vh - 16px)', left: 'calc(25vw - 16px)' }}
+            initial={{ opacity: 0.6 }}
+            animate={{ opacity: [0.4, 0.75, 0.4] }}
+            transition={{ duration: 4.5, repeat: Infinity, repeatType: 'mirror', delay: 2.5, ease: 'easeInOut' }}
+          >
+            <motion.div
+              className="absolute top-0 left-0 h-px w-9 bg-heading"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 0.38, delay: 2.3, ease: [0.25, 0.1, 0.25, 1] }}
+              style={{ transformOrigin: 'left' }}
+            />
+            <motion.div
+              className="absolute top-0 left-0 w-px h-9 bg-heading"
+              initial={{ scaleY: 0 }}
+              animate={{ scaleY: 1 }}
+              transition={{ duration: 0.38, delay: 2.45, ease: [0.25, 0.1, 0.25, 1] }}
+              style={{ transformOrigin: 'top' }}
+            />
+          </motion.div>
+
+          {/* Bottom-right corner */}
+          <motion.div
+            className="absolute"
+            style={{ bottom: 'calc(20vh - 16px)', right: 'calc(25vw - 16px)' }}
+            initial={{ opacity: 0.6 }}
+            animate={{ opacity: [0.4, 0.75, 0.4] }}
+            transition={{ duration: 4.5, repeat: Infinity, repeatType: 'mirror', delay: 2.8, ease: 'easeInOut' }}
+          >
+            <motion.div
+              className="absolute bottom-0 right-0 h-px w-9 bg-heading"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 0.38, delay: 2.5, ease: [0.25, 0.1, 0.25, 1] }}
+              style={{ transformOrigin: 'right' }}
+            />
+            <motion.div
+              className="absolute bottom-0 right-0 w-px h-9 bg-heading"
+              initial={{ scaleY: 0 }}
+              animate={{ scaleY: 1 }}
+              transition={{ duration: 0.38, delay: 2.65, ease: [0.25, 0.1, 0.25, 1] }}
+              style={{ transformOrigin: 'bottom' }}
+            />
+          </motion.div>
+        </motion.div>
+
+        {/* ── Step 4b: Role + CTAs — appears with corner markers ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 1.9, ease: [0.25, 0.1, 0.25, 1] }}
+          className="absolute left-0 right-0 z-20"
+          style={{ top: 'calc(50% + 34vh)' }}
+        >
+          <motion.div
+            style={{ opacity: textOpacity }}
+            className="flex flex-col items-center gap-5"
+          >
             <TextGlitch
               ref={glitchRef}
-              as="h1"
-              trigger={hasLoaded}
+              as="p"
+              trigger={roleVisible}
               duration={0.5}
               speed={0.03}
-              className="text-5xl md:text-6xl lg:text-7xl type-hero text-heading"
-              style={{ letterSpacing: '0.1em' }}
+              className="type-hero text-muted uppercase"
+              style={{ letterSpacing: '0.12em', fontSize: 'clamp(0.85rem, 1.6vw, 1.6rem)' }}
             >
               {roles[0]}
             </TextGlitch>
-          </div>
+
+            <div className="flex items-center gap-4">
+              <Link
+                href="#contact"
+                className="px-6 py-3 type-label bg-heading text-page hover:opacity-80 transition-opacity duration-200"
+              >
+                CONTACT ME
+              </Link>
+              <a
+                href="/resume.pdf"
+                target="_blank"
+                rel="noreferrer"
+                className="px-6 py-3 type-label border border-edge text-heading hover:border-edge-strong transition-colors duration-200"
+              >
+                VIEW RESUME
+              </a>
+            </div>
+          </motion.div>
         </motion.div>
 
-        {/* ── Description lines (slide up sequentially) ── */}
+        {/* ── Description lines (scroll 40–70%) ── */}
         <div className="absolute left-12 top-1/2 -translate-y-1/2 max-w-4xl z-20">
           <div className="flex flex-col items-start text-left gap-8">
             <div className="overflow-hidden">
@@ -172,7 +302,7 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* ── Hero marquee — glassmorphism strip, floats in at bottom ── */}
+        {/* ── Marquee (scroll 74–86%) ── */}
         <motion.div
           style={{
             opacity: marqueeOpacity,
@@ -185,18 +315,12 @@ export function HeroSection() {
           className="absolute bottom-0 left-0 right-0 z-30 overflow-hidden py-5 border-t"
           aria-hidden="true"
         >
-          {/*
-           * Two identical sets inside separate flex wrappers with matching padding-right.
-           * pr-8 == gap-8, so the trailing space of set-1 equals the gap within each set,
-           * making the seam at -50% translateX perfectly equidistant.
-           */}
           <motion.div
             animate={{ x: ['0%', '-50%'] }}
             transition={{ duration: 28, ease: 'linear', repeat: Infinity, repeatType: 'loop' }}
             className="flex items-center"
             style={{ width: 'max-content' }}
           >
-            {/* Set 1 */}
             <div className="flex items-center gap-8 pr-8 flex-shrink-0">
               {MARQUEE_SET.map((item, i) =>
                 item.type === 'sep' ? (
@@ -212,7 +336,6 @@ export function HeroSection() {
                 )
               )}
             </div>
-            {/* Set 2 — identical, creates the seamless loop */}
             <div className="flex items-center gap-8 pr-8 flex-shrink-0">
               {MARQUEE_SET.map((item, i) =>
                 item.type === 'sep' ? (
