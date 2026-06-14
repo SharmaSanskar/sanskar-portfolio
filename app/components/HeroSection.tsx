@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
-import Link from 'next/link';
 import { TextGlitch, type TextGlitchHandle } from './TextGlitch';
 import { PaperShader } from './PaperShader';
 import { shaderColors } from '@/app/constants/colors';
+
+const RESUME_URL = 'https://drive.google.com/file/d/1IYAmDrdmkQ3MfcmaABN2AZqZ_DXA_zP4/preview';
 
 const roles = [
   'Software Engineer',
@@ -44,7 +45,7 @@ export function HeroSection() {
 
   // Shader scroll scale: expands to fill viewport
   const boxScale = useTransform(scrollYProgress, [0, 0.4], [1, 3.5]);
-  const boxBorderRadius = useTransform(scrollYProgress, [0, 0.4], [16, 0]);
+  const boxBorderRadius = useTransform(scrollYProgress, [0, 0.4], [0, 0]);
 
   // All hero foreground fades out early on scroll
   const textOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
@@ -114,7 +115,7 @@ export function HeroSection() {
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ duration: 1.4, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 1.8, delay: 0.5, ease: [0.4, 0, 0.2, 1] }}
           className="relative"
         >
           <motion.div
@@ -143,8 +144,8 @@ export function HeroSection() {
                     className="text-heading leading-relaxed"
                     style={{ fontSize: '11px', letterSpacing: '0.03em', opacity: 0.5 }}
                   >
-                    Quiet creator, bringing ideas to life,<br />
-                    through motion, detail and softness
+                    Obsessed with the in-between.<br />
+                    The quiet that makes noise worthwhile.
                   </p>
                 </div>
 
@@ -254,14 +255,14 @@ export function HeroSection() {
             </TextGlitch>
 
             <div className="flex items-center gap-4">
-              <Link
-                href="#contact"
+              <a
+                href="mailto:sharma.sans@northeastern.edu"
                 className="px-6 py-3 type-label bg-heading text-page hover:opacity-80 transition-opacity duration-200"
               >
                 CONTACT ME
-              </Link>
+              </a>
               <a
-                href="/resume.pdf"
+                href={RESUME_URL}
                 target="_blank"
                 rel="noreferrer"
                 className="px-6 py-3 type-label border border-edge text-heading hover:border-edge-strong transition-colors duration-200"
