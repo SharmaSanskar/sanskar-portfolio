@@ -5,8 +5,8 @@ export const COLORS = {
 } as const;
 
 export const shaderColors = {
-  // Indigo-infused gradient: near-black → dark → indigo midtone → signature indigo.
-  // The MeshGradient flows these together, giving the box a living indigo glow on dark.
-  dark:  ['#09090B', '#15151B', '#2E2B52', '#7079E8'] as const,
-  light: ['#FAFAFA', '#F0F0F3', '#DAD9F5', '#A5A9F0'] as const,
+  // Vibrant indigo gradient — a dark anchor + saturated indigos so the full-bleed
+  // hero shader reads alive (not dimmed). Edge scrims keep text legible.
+  dark:  ['#0B0B16', '#2E2B6E', '#4F46E5', '#8B8FF5'] as const,
+  light: ['#FAFAFA', '#E8E7FB', '#C7C9F5', '#A5A9F0'] as const,
 } as const;

@@ -111,6 +111,7 @@
   --color-on-accent:     var(--color-on-accent);
   --font-sans:           var(--font-inter);
   --font-mono:           var(--font-jetbrains-mono);
+  --font-serif:          var(--font-playfair);
 }
 
 html {

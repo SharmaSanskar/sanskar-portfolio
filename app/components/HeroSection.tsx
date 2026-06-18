@@ -12,6 +12,12 @@ const RESUME_URL = 'https://drive.google.com/file/d/1IYAmDrdmkQ3MfcmaABN2AZqZ_DX
 
 const roles = ['Software Engineer', 'Creative Developer', 'UI Engineer', 'Fullstack Architect'];
 
+const socials = [
+  { label: 'GITHUB', href: 'https://github.com/SharmaSanskar' },
+  { label: 'LINKEDIN', href: 'https://www.linkedin.com/in/sharma-sanskar/' },
+  { label: 'RÉSUMÉ', href: RESUME_URL },
+];
+
 const MARQUEE_ITEMS = [
   'Always Shipping',
   'Zero to Deployed',
@@ -59,13 +65,9 @@ export function HeroSection() {
     offset: ['start start', 'end start'],
   });
 
-  // Centered shader portal grows to fill the viewport on scroll, becoming the
-  // full-bleed background that the next section slides over.
-  const boxScale = useTransform(scrollYProgress, [0, 0.4], [1, 3.6]);
-
-  // All hero foreground fades out early on scroll.
+  // Vibrant full-bleed shader blooms (scales) to fill on scroll → next-section handoff.
+  const shaderScale = useTransform(scrollYProgress, [0, 0.45], [1, 1.4]);
   const textOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
-  const nameY = useTransform(scrollYProgress, [0, 0.2], [0, -60]);
 
   // Description lines (scroll 40–70%)
   const line1Opacity = useTransform(scrollYProgress, [0.4, 0.5], [0, 1]);
@@ -102,131 +104,135 @@ export function HeroSection() {
     return () => clearInterval(interval);
   }, [roleVisible, currentRoleIndex]);
 
+  const nameStyle = { fontSize: 'clamp(3rem, 12vw, 13rem)', lineHeight: 0.92 } as const;
+
   return (
     <section ref={sectionRef} className="relative h-[500vh] bg-page">
       <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
 
-        {/* ── Centered shader portal (grows to full-bleed on scroll) ── */}
+        {/* ── z0: vibrant full-bleed shader ── */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.72 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.5, delay: 0.2, ease: EASE.outExpo }}
-          className="relative"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.4, ease: EASE.out }}
+          className="absolute inset-0 z-0"
         >
-          <div className="relative w-[86vw] md:w-[52vw] h-[56vh] md:h-[66vh]">
-
-              {/* Accent halo glowing around the portal edges */}
-              <motion.div
-                style={{ opacity: textOpacity, background: 'radial-gradient(ellipse at center, var(--color-accent-glow), transparent 70%)' }}
-                className="absolute -inset-12 z-0 blur-[90px] pointer-events-none"
-                aria-hidden="true"
-              />
-
-              {/* Shader (the element that scales to full-bleed) */}
-              <motion.div
-                style={{ scale: boxScale }}
-                className="absolute inset-0 z-10 overflow-hidden"
-              >
-                <PaperShader colors={isDark ? shaderColors.dark : shaderColors.light} speed={0.3} />
-              </motion.div>
-
-              {/* Frame furniture — corner markers + quote (do not scale, fade on scroll) */}
-              <motion.div style={{ opacity: textOpacity }} className="absolute inset-0 z-20 pointer-events-none" aria-hidden="true">
-                {/* top-left L */}
-                <div className="absolute -top-2 -left-2">
-                  <motion.div className="absolute top-0 left-0 h-px w-9 bg-accent" initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.4, delay: 1.6, ease: EASE.out }} style={{ transformOrigin: 'left' }} />
-                  <motion.div className="absolute top-0 left-0 w-px h-9 bg-accent" initial={{ scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ duration: 0.4, delay: 1.72, ease: EASE.out }} style={{ transformOrigin: 'top' }} />
-                </div>
-                {/* bottom-right L */}
-                <div className="absolute -bottom-2 -right-2">
-                  <motion.div className="absolute bottom-0 right-0 h-px w-9 bg-accent" initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.4, delay: 1.8, ease: EASE.out }} style={{ transformOrigin: 'right' }} />
-                  <motion.div className="absolute bottom-0 right-0 w-px h-9 bg-accent" initial={{ scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ duration: 0.4, delay: 1.92, ease: EASE.out }} style={{ transformOrigin: 'bottom' }} />
-                </div>
-                {/* quote — top-left inside portal */}
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 1.5, ease: EASE.out }}
-                  className="absolute top-5 left-5 max-w-[60%]"
-                >
-                  <p className="text-heading leading-relaxed" style={{ fontSize: '11px', letterSpacing: '0.03em', opacity: 0.55 }}>
-                    Obsessed with the in-between.<br />
-                    The quiet that makes noise worthwhile.
-                  </p>
-                </motion.div>
-              </motion.div>
-            </div>
+          <motion.div style={{ scale: shaderScale }} className="w-full h-full">
+            <PaperShader colors={isDark ? shaderColors.dark : shaderColors.light} speed={0.32} />
+          </motion.div>
         </motion.div>
 
-        {/* ── Foreground content — centered over the portal (depth layers) ── */}
-        <motion.div
-          style={{ opacity: textOpacity, y: nameY }}
-          className="absolute inset-0 z-30 flex flex-col items-center justify-center text-center px-6 pointer-events-none"
-        >
-          {/* Eyebrow — rotating role with live status dot */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 1.3, ease: EASE.out }}
-            className="flex items-center justify-center gap-3 mb-5 md:mb-7"
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-accent opacity-75 animate-ping" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
-            </span>
-            <TextGlitch
-              ref={glitchRef}
-              as="p"
-              trigger={roleVisible}
-              duration={0.5}
-              speed={0.03}
-              className="type-label text-muted"
-              style={{ letterSpacing: '0.18em' }}
-            >
-              {roles[0]}
-            </TextGlitch>
-          </motion.div>
+        {/* ── z1: edge scrims (top + bottom) — center shader stays vibrant ── */}
+        <div
+          className="absolute inset-0 z-[1] pointer-events-none"
+          style={{ background: 'linear-gradient(to bottom, var(--color-page) 0%, transparent 24%, transparent 52%, var(--color-page) 100%)' }}
+          aria-hidden="true"
+        />
 
-          {/* Name — dimmer first name, brighter last name with accent period */}
-          <RevealText
-            as="h1"
-            text="SANSKAR"
-            delay={0.45}
-            duration={0.95}
-            className="block font-bold text-heading leading-[0.9] tracking-tight"
-            style={{ fontSize: 'clamp(2rem, 6.6vw, 7.2rem)', opacity: 0.5 }}
-          />
-          <div
-            className="flex justify-center font-bold text-heading leading-[0.82] tracking-tight"
-            style={{ fontSize: 'clamp(2.6rem, 9vw, 10rem)' }}
-          >
-            <RevealText text="SHARMA" delay={0.6} duration={0.95} className="inline-block" />
-            <RevealText text="." delay={0.72} duration={0.95} className="inline-block" wordClassName="text-accent" />
+        {/* ── z10: foreground ── */}
+        <motion.div
+          style={{ opacity: textOpacity }}
+          className="absolute inset-0 z-10 flex flex-col px-8 md:px-12 py-9 md:py-10 pointer-events-none"
+        >
+          {/* Top row — quote (left) + rotating role (right) */}
+          <div className="flex items-start justify-between gap-6">
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4, ease: EASE.out }}
+              className="text-secondary leading-relaxed max-w-[30ch]"
+              style={{ fontSize: '13px', letterSpacing: '0.01em' }}
+            >
+              Obsessed with the in-between.<br />
+              <span className="italic">The quiet that makes noise worthwhile.</span>
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5, ease: EASE.out }}
+              className="flex items-center gap-2.5 flex-shrink-0"
+            >
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-accent opacity-75 animate-ping" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
+              </span>
+              <TextGlitch
+                ref={glitchRef}
+                as="span"
+                trigger={roleVisible}
+                duration={0.5}
+                speed={0.03}
+                className="type-label text-secondary"
+              >
+                {roles[0]}
+              </TextGlitch>
+            </motion.div>
           </div>
 
-          {/* CTAs */}
+          <div className="flex-1" />
+
+          {/* Split-baseline name */}
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-x-6 mb-8 md:mb-10">
+            <RevealText
+              as="span"
+              text="Sanskar"
+              delay={0.5}
+              duration={0.95}
+              className="block font-medium text-heading tracking-tight"
+              style={nameStyle}
+            />
+            <RevealText
+              as="span"
+              text="Sharma."
+              delay={0.66}
+              duration={0.95}
+              className="block font-serif italic tracking-tight md:text-right"
+              wordClassName="bg-gradient-to-br from-white to-[#A5B4FC] bg-clip-text text-transparent"
+              style={nameStyle}
+            />
+          </div>
+
+          {/* Utility bar */}
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.0, ease: EASE.out }}
-            className="flex items-center justify-center gap-4 mt-8 md:mt-10 pointer-events-auto"
+            transition={{ duration: 0.6, delay: 0.95, ease: EASE.out }}
+            className="border-t border-edge pt-5 flex flex-wrap items-center justify-between gap-4 pointer-events-auto"
           >
+            {/* status */}
+            <div className="flex items-center gap-2.5">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-accent opacity-75 animate-ping" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
+              </span>
+              <span className="type-label text-secondary">Available for work</span>
+            </div>
+
+            {/* socials */}
+            <div className="flex items-center gap-3">
+              {socials.map((s, i) => (
+                <span key={s.label} className="flex items-center gap-3">
+                  <a
+                    href={s.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="type-label text-secondary hover:text-accent transition-colors duration-200 link-underline"
+                  >
+                    {s.label}
+                  </a>
+                  {i < socials.length - 1 && <span className="text-dim text-xs select-none">/</span>}
+                </span>
+              ))}
+            </div>
+
+            {/* primary CTA */}
             <Magnetic>
               <a
                 href="mailto:sharma.sans@northeastern.edu"
                 className="block px-6 py-3 type-label bg-accent text-on-accent transition-[background-color,box-shadow] duration-300 hover:bg-accent-hover hover:shadow-[0_10px_36px_var(--color-accent-glow)]"
               >
-                CONTACT ME
-              </a>
-            </Magnetic>
-            <Magnetic>
-              <a
-                href={RESUME_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="block px-6 py-3 type-label border border-edge text-heading transition-colors duration-300 hover:border-accent hover:text-accent"
-              >
-                VIEW RESUME
+                GET IN TOUCH
               </a>
             </Magnetic>
           </motion.div>

@@ -67,7 +67,7 @@ export function RevealText({
           key={i}
           aria-hidden="true"
           className="inline-block overflow-hidden align-bottom"
-          style={{ paddingBottom: '0.08em', marginBottom: '-0.08em' }}
+          style={{ paddingBottom: '0.22em', marginBottom: '-0.22em' }}
         >
           <motion.span variants={child} className={`inline-block will-change-transform ${wordClassName}`}>
             {word}
