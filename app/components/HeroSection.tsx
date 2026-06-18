@@ -66,20 +66,30 @@ export function HeroSection() {
   });
 
   // Vibrant full-bleed shader blooms (scales) to fill on scroll → next-section handoff.
-  const shaderScale = useTransform(scrollYProgress, [0, 0.45], [1, 1.4]);
-  const textOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
+  const shaderScale = useTransform(scrollYProgress, [0, 0.5], [1, 1.45]);
 
-  // Description lines (scroll 40–70%)
-  const line1Opacity = useTransform(scrollYProgress, [0.4, 0.5], [0, 1]);
-  const line1Y = useTransform(scrollYProgress, [0.4, 0.5], [50, 0]);
-  const line2Opacity = useTransform(scrollYProgress, [0.5, 0.6], [0, 1]);
-  const line2Y = useTransform(scrollYProgress, [0.5, 0.6], [50, 0]);
-  const line3Opacity = useTransform(scrollYProgress, [0.6, 0.7], [0, 1]);
-  const line3Y = useTransform(scrollYProgress, [0.6, 0.7], [50, 0]);
+  // Everything except the name fades out almost immediately on scroll.
+  const elemsOpacity = useTransform(scrollYProgress, [0, 0.12], [1, 0]);
 
-  // Marquee (scroll 74–86%)
-  const marqueeOpacity = useTransform(scrollYProgress, [0.74, 0.86], [0, 1]);
-  const marqueeY = useTransform(scrollYProgress, [0.74, 0.86], [24, 0]);
+  // The name rises to vertical center (0→0.28), then disintegrates (0.3→0.5):
+  // drifts up, scales, blurs, letters spread apart, and fades.
+  const nameY = useTransform(scrollYProgress, [0, 0.28, 0.5], ['0vh', '-30vh', '-38vh']);
+  const nameScale = useTransform(scrollYProgress, [0.3, 0.5], [1, 1.18]);
+  const nameBlur = useTransform(scrollYProgress, [0.3, 0.5], ['blur(0px)', 'blur(18px)']);
+  const nameLetter = useTransform(scrollYProgress, [0.3, 0.5], ['0em', '0.4em']);
+  const nameOpacity = useTransform(scrollYProgress, [0.34, 0.5], [1, 0]);
+
+  // Description lines (after the name has dissolved)
+  const line1Opacity = useTransform(scrollYProgress, [0.55, 0.62], [0, 1]);
+  const line1Y = useTransform(scrollYProgress, [0.55, 0.62], [50, 0]);
+  const line2Opacity = useTransform(scrollYProgress, [0.63, 0.70], [0, 1]);
+  const line2Y = useTransform(scrollYProgress, [0.63, 0.70], [50, 0]);
+  const line3Opacity = useTransform(scrollYProgress, [0.71, 0.78], [0, 1]);
+  const line3Y = useTransform(scrollYProgress, [0.71, 0.78], [50, 0]);
+
+  // Marquee
+  const marqueeOpacity = useTransform(scrollYProgress, [0.82, 0.92], [0, 1]);
+  const marqueeY = useTransform(scrollYProgress, [0.82, 0.92], [24, 0]);
 
   useEffect(() => {
     const update = () => setIsDark(document.documentElement.dataset.theme !== 'light');
@@ -130,12 +140,9 @@ export function HeroSection() {
         />
 
         {/* ── z10: foreground ── */}
-        <motion.div
-          style={{ opacity: textOpacity }}
-          className="absolute inset-0 z-10 flex flex-col px-8 md:px-12 py-9 md:py-10 pointer-events-none"
-        >
-          {/* Top row — quote (left) + rotating role (right) */}
-          <div className="flex items-start justify-between gap-6">
+        <div className="absolute inset-0 z-10 flex flex-col px-8 md:px-12 py-9 md:py-10 pointer-events-none">
+          {/* Top row — quote (left) + rotating role (right) — fades on scroll */}
+          <motion.div style={{ opacity: elemsOpacity }} className="flex items-start justify-between gap-6">
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -164,16 +171,20 @@ export function HeroSection() {
                 duration={0.5}
                 speed={0.03}
                 className="type-label text-secondary"
+                style={{ fontSize: '0.95rem' }}
               >
                 {roles[0]}
               </TextGlitch>
             </motion.div>
-          </div>
+          </motion.div>
 
           <div className="flex-1" />
 
-          {/* Split-baseline name */}
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-x-6 mb-8 md:mb-10">
+          {/* Split-baseline name — rises to center on scroll, then disintegrates */}
+          <motion.div
+            style={{ y: nameY, scale: nameScale, filter: nameBlur, letterSpacing: nameLetter, opacity: nameOpacity }}
+            className="flex flex-col md:flex-row md:items-end md:justify-between gap-x-6 mb-8 md:mb-10 origin-center will-change-transform"
+          >
             <RevealText
               as="span"
               text="Sanskar"
@@ -191,9 +202,10 @@ export function HeroSection() {
               wordClassName="bg-gradient-to-br from-white to-[#A5B4FC] bg-clip-text text-transparent"
               style={nameStyle}
             />
-          </div>
+          </motion.div>
 
-          {/* Utility bar */}
+          {/* Utility bar — fades on scroll */}
+          <motion.div style={{ opacity: elemsOpacity }}>
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
@@ -236,9 +248,10 @@ export function HeroSection() {
               </a>
             </Magnetic>
           </motion.div>
-        </motion.div>
+          </motion.div>
+        </div>
 
-        {/* ── Description lines (scroll 40–70%) ── */}
+        {/* ── Description lines (after the name dissolves) ── */}
         <div className="absolute left-12 top-1/2 -translate-y-1/2 max-w-4xl z-20 pointer-events-none">
           <div className="flex flex-col items-start text-left gap-8">
             <div className="overflow-hidden">
