@@ -103,7 +103,7 @@ export default function AboutContactSection() {
             className="type-greeting text-heading"
           >
             Hello <span className="inline-block">
-              <span ref={portalRef} className="inline-block">T</span>here :)
+              <span ref={portalRef} className="inline-block">T</span>here <span className="text-accent">:)</span>
             </span>
           </h1>
         </div>
@@ -117,7 +117,7 @@ export default function AboutContactSection() {
           <h2
             className="type-statement text-4xl md:text-6xl text-center text-heading-inv"
           >
-            I build scalable software that turns complex problems into simple, reliable products.
+            I build <span className="text-accent">scalable software</span> that turns complex problems into simple, reliable products.
           </h2>
 
           {/* Bottom — Two columns */}
@@ -128,7 +128,7 @@ export default function AboutContactSection() {
               {/* Image 1 — starts higher */}
               <div
                 className="w-1/2 aspect-[3/4] overflow-hidden flex-shrink-0"
-                style={{ border: '1px solid var(--color-edge-subtle)' }}
+                style={{ border: '1px solid var(--color-accent-soft)' }}
               >
                 <img
                   src="/about/photo1.jpg"
@@ -139,7 +139,7 @@ export default function AboutContactSection() {
               {/* Image 2 — offset down */}
               <div
                 className="w-1/2 aspect-[3/4] overflow-hidden flex-shrink-0 mt-10"
-                style={{ border: '1px solid var(--color-edge-subtle)' }}
+                style={{ border: '1px solid var(--color-accent-soft)' }}
               >
                 <img
                   src="/about/photo2.jpg"

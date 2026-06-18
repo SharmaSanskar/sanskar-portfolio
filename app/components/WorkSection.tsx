@@ -166,7 +166,8 @@ function WorkCard({ experience }: { experience: WorkExperience }) {
         {/* LOGO BOX */}
         <div
           ref={logoBoxRef}
-          className="w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 flex items-center justify-center border flex-shrink-0 relative cursor-pointer bg-page border-edge/40 overflow-hidden"
+          data-cursor={isExpanded ? 'Close' : 'View'}
+          className="w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 flex items-center justify-center border border-edge/40 flex-shrink-0 relative cursor-pointer bg-page overflow-hidden"
           onClick={handleLogoClick}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
@@ -185,12 +186,6 @@ function WorkCard({ experience }: { experience: WorkExperience }) {
             </div>
           )}
 
-          {/* View Details Overlay */}
-          <div className={`absolute inset-0 z-10 flex items-center justify-center bg-overlay transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-            <span className="type-overlay text-heading">
-              {isExpanded ? 'Close' : 'View Details'}
-            </span>
-          </div>
         </div>
 
         {/* TEXT AREA */}

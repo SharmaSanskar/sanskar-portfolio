@@ -104,16 +104,13 @@ export function ContactSection({ isRevealed = true }: ContactSectionProps) {
                 className="flex items-center gap-4 group w-fit"
               >
                 <div
-                  className="w-12 h-12 flex items-center justify-center border transition-all duration-300 group-hover:scale-110"
-                  style={{
-                    borderColor: 'var(--color-edge)',
-                    background: 'var(--color-input-bg)',
-                  }}
+                  className="w-12 h-12 flex items-center justify-center border border-edge group-hover:border-accent transition-all duration-300 group-hover:scale-110"
+                  style={{ background: 'var(--color-input-bg)' }}
                 >
-                  <link.icon size={20} style={{ color: 'var(--color-heading)' }} />
+                  <link.icon size={20} className="text-heading transition-colors duration-300 group-hover:text-accent" />
                 </div>
                 <span
-                  className="text-lg md:text-xl text-heading transition-colors duration-300 group-hover:opacity-70"
+                  className="text-lg md:text-xl text-heading transition-colors duration-300 group-hover:text-accent"
                 >
                   {link.text}
                 </span>
@@ -135,7 +132,7 @@ export function ContactSection({ isRevealed = true }: ContactSectionProps) {
                   placeholder="Name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="p-4 rounded-none border border-edge bg-input-bg text-heading placeholder:text-muted focus:outline-none focus:border-edge-strong transition-colors duration-300"
+                  className="p-4 rounded-none border border-edge bg-input-bg text-heading placeholder:text-muted focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_var(--color-accent-soft)] transition-[border-color,box-shadow] duration-300"
                   required
                 />
                 <input
@@ -144,7 +141,7 @@ export function ContactSection({ isRevealed = true }: ContactSectionProps) {
                   placeholder="Email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="p-4 rounded-none border border-edge bg-input-bg text-heading placeholder:text-muted focus:outline-none focus:border-edge-strong transition-colors duration-300"
+                  className="p-4 rounded-none border border-edge bg-input-bg text-heading placeholder:text-muted focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_var(--color-accent-soft)] transition-[border-color,box-shadow] duration-300"
                   required
                 />
               </div>
@@ -153,16 +150,16 @@ export function ContactSection({ isRevealed = true }: ContactSectionProps) {
                 placeholder="Message"
                 value={formData.message}
                 onChange={handleChange}
-                className="w-full p-4 rounded-none border border-edge bg-input-bg text-heading placeholder:text-muted focus:outline-none focus:border-edge-strong transition-colors duration-300 resize-none h-48"
+                className="w-full p-4 rounded-none border border-edge bg-input-bg text-heading placeholder:text-muted focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_var(--color-accent-soft)] transition-[border-color,box-shadow] duration-300 resize-none h-48"
                 required
               />
               <motion.button
                 type="submit"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full p-4 border border-edge bg-surface text-heading transition-all duration-300 hover:bg-reveal hover:text-heading-inv"
+                className="w-full p-4 type-label bg-accent text-on-accent transition-[background-color,box-shadow] duration-300 hover:bg-accent-hover hover:shadow-[0_10px_36px_var(--color-accent-glow)]"
               >
-                Send Message
+                SEND MESSAGE
               </motion.button>
               {status && (
                 <motion.p
