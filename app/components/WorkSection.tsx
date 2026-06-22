@@ -5,7 +5,6 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { TextGlitch, type TextGlitchHandle } from './TextGlitch';
-import { COLORS } from '@/app/constants/colors';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -69,6 +68,11 @@ export function WorkSection() {
         pinSpacing: true,
       });
 
+      // Resolve to concrete hex so GSAP interpolates smoothly (it can't tween a CSS var()).
+      const rootStyles = getComputedStyle(document.documentElement);
+      const startColor = rootStyles.getPropertyValue('--color-section-start').trim();
+      const pageColor = rootStyles.getPropertyValue('--color-page').trim();
+
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: section,
@@ -78,18 +82,22 @@ export function WorkSection() {
         },
       });
 
-      tl.fromTo(container, 
-        { x: '100vw', opacity: 0 }, 
+      tl.fromTo(container,
+        { x: '100vw', opacity: 0 },
         { x: 0, opacity: 1, ease: 'none' }
       );
 
-      tl.to(section, { backgroundColor: COLORS.page, ease: 'none' }, 0);
+      tl.fromTo(section,
+        { backgroundColor: startColor },
+        { backgroundColor: pageColor, ease: 'none' },
+        0
+      );
     },
     { scope: sectionRef }
   );
 
   return (
-    <section ref={sectionRef} className="relative h-screen overflow-hidden bg-surface">
+    <section ref={sectionRef} className="relative h-screen overflow-hidden" style={{ backgroundColor: 'var(--color-section-start)' }}>
       <div className="h-screen relative">
         {/* WORK Title */}
         <div className="absolute top-16 md:top-20 left-12 md:left-20 z-10">

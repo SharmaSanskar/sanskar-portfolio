@@ -176,19 +176,25 @@ export function ContactSection({ isRevealed = true }: ContactSectionProps) {
         </div>
       </div>
 
-      {/* Bottom - Big Text */}
+      {/* Bottom — split signature, mirroring the hero name, hugging the bottom edge */}
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={isRevealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
         transition={{ duration: 1, ease: 'easeOut', delay: 0.5 }}
-        className="pb-3 md:pb-4 text-center"
+        className="px-8 md:px-12 pb-5 md:pb-7 flex flex-wrap items-baseline justify-center gap-x-[0.28em]"
       >
         <h2
-          className="font-bold text-heading leading-none tracking-[0.15em] whitespace-nowrap"
-          style={{ fontSize: 'clamp(4rem, 8vw, 14rem)' }}
+          className="font-medium text-heading tracking-tight leading-[0.92]"
+          style={{ fontSize: 'clamp(3rem, 12vw, 13rem)' }}
         >
-          LET'S CONNECT
+          Let&apos;s
         </h2>
+        <span
+          className="font-serif italic tracking-tight leading-[0.92] bg-gradient-to-br from-heading to-accent bg-clip-text text-transparent"
+          style={{ fontSize: 'clamp(3rem, 12vw, 13rem)' }}
+        >
+          Connect.
+        </span>
       </motion.div>
     </div>
   );

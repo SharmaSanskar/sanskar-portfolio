@@ -199,7 +199,7 @@ export function HeroSection() {
               delay={0.66}
               duration={0.95}
               className="block font-serif italic tracking-tight md:text-right"
-              wordClassName="bg-gradient-to-br from-white to-[#A5B4FC] bg-clip-text text-transparent"
+              wordClassName="bg-gradient-to-br from-heading to-accent bg-clip-text text-transparent"
               style={nameStyle}
             />
           </motion.div>

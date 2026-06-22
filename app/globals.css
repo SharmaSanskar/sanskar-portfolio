@@ -15,6 +15,7 @@
   --color-section:       #131316;
   --color-surface:       #1C1C21;
   --color-surface-hover: #26262D;
+  --color-section-start: #14122B; /* deep indigo: WorkSection start before it fades to page */
   --color-overlay:       rgba(9, 9, 11, 0.85);
   --color-reveal:        #EBEBF0;
   --color-input-bg:      rgba(19, 19, 22, 0.60);
@@ -55,6 +56,7 @@
   --color-section:       #F0F0F3;
   --color-surface:       #FFFFFF;
   --color-surface-hover: #F5F5F7;
+  --color-section-start: #E4E3F7; /* pale indigo: WorkSection start before it fades to page */
   --color-overlay:       rgba(9, 9, 11, 0.80);
   --color-reveal:        #131316;
   --color-input-bg:      rgba(240, 240, 243, 0.80);
