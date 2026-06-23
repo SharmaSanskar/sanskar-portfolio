@@ -25,7 +25,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Portfolio - Creative Developer",
+  title: "Portfolio - Sanskar Sharma",
   description: "A software engineer blending creativity and code",
 };
 
