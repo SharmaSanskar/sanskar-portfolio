@@ -37,7 +37,11 @@ export default function AboutContactSection() {
     };
 
     setPortalOrigin();
-    gsap.set(aboutContent, { opacity: 0, y: 50 });
+    const revealEls = aboutContent.querySelectorAll('[data-reveal]');
+    // Section itself does not move — only its bg appears (seamlessly, since its
+    // color matches the "Hello there" text). The elements materialize in.
+    gsap.set(aboutContent, { opacity: 0 });
+    gsap.set(revealEls, { autoAlpha: 0, filter: 'blur(14px)', scale: 1.06 });
     window.addEventListener('resize', setPortalOrigin);
 
     const tl = gsap.timeline({
@@ -69,10 +73,17 @@ export default function AboutContactSection() {
       })
       .to(aboutContent, {
         opacity: 1,
-        y: 0,
-        duration: 0.14,
-        ease: 'power2.out'
+        duration: 0.04,
+        ease: 'none'
       }, '<')
+      .to(revealEls, {
+        autoAlpha: 1,
+        filter: 'blur(0px)',
+        scale: 1,
+        duration: 0.18,
+        stagger: 0.05,
+        ease: 'power2.out'
+      }, '<0.02')
       .to(about, {
         yPercent: -100,
         duration: 0.33,
@@ -111,10 +122,11 @@ export default function AboutContactSection() {
         {/* About Content */}
         <div
           ref={aboutContentRef}
-          className="absolute inset-0 flex flex-col justify-center px-10 md:px-20 gap-12 md:gap-16 bg-reveal"
+          className="absolute inset-0 flex flex-col justify-center px-10 md:px-20 gap-12 md:gap-16 bg-heading"
         >
           {/* Top — Main Statement */}
           <h2
+            data-reveal
             className="type-statement text-4xl md:text-6xl text-center text-heading-inv"
           >
             I build <span className="text-accent">scalable software</span> that turns complex problems into simple, reliable products.
@@ -127,6 +139,7 @@ export default function AboutContactSection() {
             <div className="flex gap-4 items-start">
               {/* Image 1 — starts higher */}
               <div
+                data-reveal
                 className="w-1/2 aspect-[3/4] overflow-hidden flex-shrink-0"
                 style={{ border: '1px solid var(--color-accent-soft)' }}
               >
@@ -138,6 +151,7 @@ export default function AboutContactSection() {
               </div>
               {/* Image 2 — offset down */}
               <div
+                data-reveal
                 className="w-1/2 aspect-[3/4] overflow-hidden flex-shrink-0 mt-10"
                 style={{ border: '1px solid var(--color-accent-soft)' }}
               >
@@ -152,6 +166,7 @@ export default function AboutContactSection() {
             {/* Right — Two indented paragraphs */}
             <div className="flex flex-col gap-8">
               <p
+                data-reveal
                 className="type-body text-body-inv"
                 style={{ textIndent: '3rem' }}
               >
@@ -160,6 +175,7 @@ export default function AboutContactSection() {
                 and then making it solid.
               </p>
               <p
+                data-reveal
                 className="type-body text-body-inv"
                 style={{ textIndent: '3rem' }}
               >

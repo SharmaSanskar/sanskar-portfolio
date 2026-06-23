@@ -181,7 +181,7 @@ export function ContactSection({ isRevealed = true }: ContactSectionProps) {
         initial={{ opacity: 0, y: 50 }}
         animate={isRevealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
         transition={{ duration: 1, ease: 'easeOut', delay: 0.5 }}
-        className="px-8 md:px-12 pb-5 md:pb-7 flex flex-wrap items-baseline justify-center gap-x-[0.28em]"
+        className="px-8 md:px-12 pb-5 md:pb-7 flex flex-wrap items-baseline justify-center gap-x-6 md:gap-x-10 gap-y-1"
       >
         <h2
           className="font-medium text-heading tracking-tight leading-[0.92]"
