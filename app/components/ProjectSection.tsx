@@ -71,6 +71,7 @@ export function ProjectSection() {
   const [active, setActive] = useState(0);
   const [entered, setEntered] = useState(false);
   const [reduce, setReduce] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Cursor tilt
   const rx = useMotionValue(0);
@@ -80,7 +81,16 @@ export function ProjectSection() {
 
   useEffect(() => {
     setReduce(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    const mq = window.matchMedia('(max-width: 767px)');
+    const apply = () => setIsMobile(mq.matches);
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
   }, []);
+
+  // On phones, the desktop carousel's preview card is hidden, so fall back to
+  // the clean stacked layout (full project content). Desktop keeps the carousel.
+  const useStatic = reduce || isMobile;
 
   // Glitch the active name once the section enters.
   useEffect(() => {
@@ -93,7 +103,7 @@ export function ProjectSection() {
       const section = sectionRef.current;
       const track = trackRef.current;
       const path = pathRef.current;
-      if (!section || !track || reduce) return;
+      if (!section || !track || useStatic) return;
 
       const pathLen = path?.getTotalLength() ?? 0;
       if (path && pathLen) {
@@ -132,13 +142,13 @@ export function ProjectSection() {
         },
       });
     },
-    { scope: sectionRef, dependencies: [reduce] }
+    { scope: sectionRef, dependencies: [useStatic] }
   );
 
-  // ── Reduced motion: static vertical stack ──
-  if (reduce) {
+  // ── Reduced motion / mobile: static vertical stack ──
+  if (useStatic) {
     return (
-      <section ref={sectionRef} className="relative bg-page py-24 px-8 md:px-20">
+      <section ref={sectionRef} className="relative bg-page py-24 px-6 md:px-20">
         <p className="type-label text-accent mb-10">Selected Work</p>
         <div className="flex flex-col gap-24">
           {projects.map((p, i) => (

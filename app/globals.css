@@ -199,7 +199,7 @@ body.cursor-none * {
 @layer components {
   /* Section display titles: WORK, PROJECTS, LET'S CONNECT */
   .type-display {
-    @apply text-8xl md:text-9xl font-bold tracking-tighter;
+    @apply text-6xl md:text-9xl font-bold tracking-tighter;
   }
 
   /* Hero name/role — uppercase with wide tracking */
@@ -215,7 +215,7 @@ body.cursor-none * {
 
   /* Greeting: Hello There :) */
   .type-greeting {
-    @apply text-7xl md:text-8xl font-bold tracking-tight font-sans;
+    @apply text-5xl md:text-8xl font-bold tracking-tight font-sans;
   }
 
   /* Company / section heading (WorkSection) */

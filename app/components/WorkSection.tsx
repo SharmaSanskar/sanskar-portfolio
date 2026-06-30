@@ -100,7 +100,7 @@ export function WorkSection() {
     <section ref={sectionRef} className="relative h-screen overflow-hidden" style={{ backgroundColor: 'var(--color-section-start)' }}>
       <div className="h-screen relative">
         {/* WORK Title */}
-        <div className="absolute top-16 md:top-20 left-12 md:left-20 z-10">
+        <div className="absolute top-12 md:top-20 left-6 md:left-20 z-10">
           <TextGlitch
             ref={titleRef}
             trigger={titleTrigger}
@@ -114,13 +114,14 @@ export function WorkSection() {
         {/* Cards Container */}
         <div
           ref={containerRef}
-          className="absolute top-64 md:top-72 left-12 md:left-20 right-12 md:right-20 grid grid-cols-2 gap-4 md:gap-8 will-change-transform"
+          className="absolute top-36 md:top-72 left-6 md:left-20 right-6 md:right-20 grid grid-cols-1 md:grid-cols-2 gap-8 will-change-transform"
         >
           {experiences.map((exp, idx) => (
             <div
               key={exp.company}
               onMouseEnter={() => titleRef.current?.scrambleTo(exp.company, false)}
               onMouseLeave={() => titleRef.current?.scrambleTo()}
+              onClick={() => titleRef.current?.scrambleTo(exp.company, false)}
             >
               <WorkCard experience={exp} />
             </div>
@@ -175,7 +176,7 @@ function WorkCard({ experience }: { experience: WorkExperience }) {
         <div
           ref={logoBoxRef}
           data-cursor={isExpanded ? 'Close' : 'View'}
-          className="w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 flex items-center justify-center border border-edge/40 flex-shrink-0 relative cursor-pointer bg-page overflow-hidden"
+          className="w-28 h-28 md:w-64 md:h-64 lg:w-80 lg:h-80 flex items-center justify-center border border-edge/40 flex-shrink-0 relative cursor-pointer bg-page overflow-hidden"
           onClick={handleLogoClick}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}

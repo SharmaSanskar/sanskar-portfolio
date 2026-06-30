@@ -142,7 +142,7 @@ export function HeroSection() {
         {/* ── z10: foreground ── */}
         <div className="absolute inset-0 z-10 flex flex-col px-8 md:px-12 py-9 md:py-10 pointer-events-none">
           {/* Top row — quote (left) + rotating role (right) — fades on scroll */}
-          <motion.div style={{ opacity: elemsOpacity }} className="flex items-start justify-between gap-6">
+          <motion.div style={{ opacity: elemsOpacity }} className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between md:gap-6">
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -183,7 +183,7 @@ export function HeroSection() {
           {/* Split-baseline name — rises to center on scroll, then disintegrates */}
           <motion.div
             style={{ y: nameY, scale: nameScale, filter: nameBlur, letterSpacing: nameLetter, opacity: nameOpacity }}
-            className="flex flex-col md:flex-row md:items-end md:justify-between gap-x-6 mb-8 md:mb-10 origin-center will-change-transform"
+            className="flex flex-col md:flex-row md:items-end md:justify-between gap-x-6 gap-y-1 mb-8 md:mb-10 origin-center will-change-transform"
           >
             <RevealText
               as="span"
@@ -210,7 +210,7 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.95, ease: EASE.out }}
-            className="border-t border-edge pt-5 flex flex-wrap items-center justify-between gap-4 pointer-events-auto"
+            className="border-t border-edge pt-5 flex flex-col items-start gap-4 md:flex-row md:flex-wrap md:items-center md:justify-between pointer-events-auto"
           >
             {/* status */}
             <div className="flex items-center gap-2.5">
@@ -252,20 +252,20 @@ export function HeroSection() {
         </div>
 
         {/* ── Description lines (after the name dissolves) ── */}
-        <div className="absolute left-12 top-1/2 -translate-y-1/2 max-w-4xl z-20 pointer-events-none">
+        <div className="absolute left-6 md:left-12 top-1/2 -translate-y-1/2 max-w-[88vw] md:max-w-4xl z-20 pointer-events-none">
           <div className="flex flex-col items-start text-left gap-8">
             <div className="overflow-hidden">
-              <motion.p style={{ y: line1Y, opacity: line1Opacity }} className="text-4xl md:text-5xl lg:text-6xl type-statement text-heading">
+              <motion.p style={{ y: line1Y, opacity: line1Opacity }} className="text-3xl md:text-5xl lg:text-6xl type-statement text-heading">
                 I turn ideas into interfaces people love using.
               </motion.p>
             </div>
             <div className="overflow-hidden">
-              <motion.p style={{ y: line2Y, opacity: line2Opacity }} className="text-4xl md:text-5xl lg:text-6xl type-statement text-heading">
+              <motion.p style={{ y: line2Y, opacity: line2Opacity }} className="text-3xl md:text-5xl lg:text-6xl type-statement text-heading">
                 Balancing performance, design, and scalability in every build.
               </motion.p>
             </div>
             <div className="overflow-hidden">
-              <motion.p style={{ y: line3Y, opacity: line3Opacity }} className="text-4xl md:text-5xl lg:text-6xl type-statement text-heading">
+              <motion.p style={{ y: line3Y, opacity: line3Opacity }} className="text-3xl md:text-5xl lg:text-6xl type-statement text-heading">
                 Writing code with intention, shipping products with purpose.
               </motion.p>
             </div>

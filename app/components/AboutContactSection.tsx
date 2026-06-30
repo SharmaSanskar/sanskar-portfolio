@@ -122,12 +122,12 @@ export default function AboutContactSection() {
         {/* About Content */}
         <div
           ref={aboutContentRef}
-          className="absolute inset-0 flex flex-col justify-center px-10 md:px-20 gap-12 md:gap-16 bg-heading"
+          className="absolute inset-0 flex flex-col justify-center px-6 md:px-20 gap-6 md:gap-16 bg-heading"
         >
           {/* Top — Main Statement */}
           <h2
             data-reveal
-            className="type-statement text-4xl md:text-6xl text-center text-heading-inv"
+            className="type-statement text-2xl md:text-6xl text-center text-heading-inv"
           >
             I build <span className="text-accent">scalable software</span> that turns complex problems into simple, reliable products.
           </h2>
@@ -167,8 +167,7 @@ export default function AboutContactSection() {
             <div className="flex flex-col gap-8">
               <p
                 data-reveal
-                className="type-body text-body-inv"
-                style={{ textIndent: '3rem' }}
+                className="type-body text-body-inv indent-6 md:indent-12"
               >
                 I'm Sanskar Sharma, a CS grad student at Northeastern University. I like
                 building products end-to-end—taking an idea, stressing it, breaking it,
@@ -176,8 +175,7 @@ export default function AboutContactSection() {
               </p>
               <p
                 data-reveal
-                className="type-body text-body-inv"
-                style={{ textIndent: '3rem' }}
+                className="type-body text-body-inv indent-6 md:indent-12"
               >
                 Most of my time goes into writing code, fixing things I thought were already
                 fixed, and chasing that one bug that refuses to exist when I look at it. When

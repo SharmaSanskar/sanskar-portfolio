@@ -50,7 +50,7 @@ export function StickyNav() {
         pointerEvents: visible ? 'auto' : 'none',
         transition: 'opacity 0.4s ease',
       }}
-      className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex gap-8 px-6 py-3 border"
+      className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex gap-5 md:gap-8 px-5 md:px-6 py-3 border"
       aria-label="Section navigation"
     >
       {links.map(({ label, href }) => (

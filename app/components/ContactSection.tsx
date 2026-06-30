@@ -78,8 +78,8 @@ export function ContactSection({ isRevealed = true }: ContactSectionProps) {
   return (
     <div className="relative h-full w-full flex flex-col">
       {/* Two Column Layout - Takes most of the space */}
-      <div className="flex-1 flex items-center justify-center px-12 md:px-20">
-        <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24">
+      <div className="flex-1 flex items-center justify-center px-6 md:px-20">
+        <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-24">
           {/* Left Column - Social Links */}
           <motion.div
             initial={{ opacity: 0, x: -100 }}

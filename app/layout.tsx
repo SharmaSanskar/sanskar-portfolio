@@ -29,6 +29,11 @@ export const metadata: Metadata = {
   description: "A software engineer blending creativity and code",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
