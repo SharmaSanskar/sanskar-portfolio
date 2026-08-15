@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import Image from 'next/image';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -44,6 +45,7 @@ export function WorkSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const [titleTrigger, setTitleTrigger] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<TextGlitchHandle | null>(null);
 
   useGSAP(
@@ -68,11 +70,6 @@ export function WorkSection() {
         pinSpacing: true,
       });
 
-      // Resolve to concrete hex so GSAP interpolates smoothly (it can't tween a CSS var()).
-      const rootStyles = getComputedStyle(document.documentElement);
-      const startColor = rootStyles.getPropertyValue('--color-section-start').trim();
-      const pageColor = rootStyles.getPropertyValue('--color-page').trim();
-
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: section,
@@ -87,9 +84,13 @@ export function WorkSection() {
         { x: 0, opacity: 1, ease: 'none' }
       );
 
-      tl.fromTo(section,
-        { backgroundColor: startColor },
-        { backgroundColor: pageColor, ease: 'none' },
+      // Was a backgroundColor tween on the <section>, which repainted the whole
+      // viewport — and the raster of every child — on each scrubbed frame.
+      // Both colors are opaque, so fading section-start out over a page-colored
+      // section is the same sRGB lerp, but opacity is compositor-only.
+      tl.fromTo(backdropRef.current,
+        { opacity: 1 },
+        { opacity: 0, ease: 'none' },
         0
       );
     },
@@ -97,7 +98,13 @@ export function WorkSection() {
   );
 
   return (
-    <section ref={sectionRef} className="relative h-screen overflow-hidden" style={{ backgroundColor: 'var(--color-section-start)' }}>
+    <section ref={sectionRef} className="relative h-screen overflow-hidden" style={{ backgroundColor: 'var(--color-page)' }}>
+      <div
+        ref={backdropRef}
+        aria-hidden="true"
+        className="absolute inset-0 z-0"
+        style={{ backgroundColor: 'var(--color-section-start)', willChange: 'opacity' }}
+      />
       <div className="h-screen relative">
         {/* WORK Title */}
         <div className="absolute top-12 md:top-20 left-6 md:left-20 z-10">
@@ -182,10 +189,12 @@ function WorkCard({ experience }: { experience: WorkExperience }) {
           onMouseLeave={() => setIsHovered(false)}
         >
           {experience.logo ? (
-            <img 
-              src={experience.logo} 
+            <Image
+              src={experience.logo}
               alt={experience.company}
-              className={`w-full h-full object-cover transition-transform duration-500 ease-out ${
+              fill
+              sizes="(max-width: 768px) 112px, (max-width: 1024px) 256px, 320px"
+              className={`object-cover transition-transform duration-500 ease-out ${
                 isHovered ? 'scale-110' : 'scale-100'
               }`}
             />

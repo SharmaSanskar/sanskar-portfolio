@@ -4,6 +4,7 @@ import { useRef, useState, useEffect } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Image from 'next/image';
 import { Github, ArrowUpRight } from 'lucide-react';
 import { motion, useMotionValue, useSpring } from 'motion/react';
 import { TextGlitch, type TextGlitchHandle } from './TextGlitch';
@@ -20,6 +21,19 @@ interface Project {
 }
 
 const projects: Project[] = [
+  {
+    title: 'Mosaic',
+    date: '08 2026',
+    description: [
+      'Built a real-time collaborative workspace where multiple users and an LLM agent share a live room.',
+      'Engineered a lock-free Go WebSocket hub using one goroutine per room, streaming AI replies to all clients.',
+      'Generated a self-updating reasoning DAG from chat context, rendered live with React Flow in a 3-pane UI.',
+      'Cut per-user socket connections 75% via shared React Context; added JWT auth, rate limiting, token metrics.',
+    ],
+    tech: ['Go', 'Next.js', 'WebSockets', 'Supabase'],
+    githubUrl: 'https://github.com/SharmaSanskar/mosaic-ai',
+    image: '/projects/mosaic.png',
+  },
   {
     title: 'GradHelp',
     date: '05 2023',
@@ -153,7 +167,9 @@ export function ProjectSection() {
         <div className="flex flex-col gap-24">
           {projects.map((p, i) => (
             <div key={p.title} className="grid md:grid-cols-2 gap-10 items-center">
-              <img src={p.image} alt={p.title} className="w-full aspect-[4/3] object-cover border border-edge-subtle" />
+              <div className="relative w-full aspect-[4/3] border border-edge-subtle">
+                <Image src={p.image} alt={p.title} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+              </div>
               <div>
                 <span className="type-index text-accent">{pad(i + 1)} / {pad(N)}</span>
                 <h3 className="font-bold text-heading tracking-tight my-3" style={{ fontSize: 'clamp(2rem,4vw,3.5rem)' }}>{p.title}</h3>
@@ -187,11 +203,14 @@ export function ProjectSection() {
   return (
     <section ref={sectionRef} className="relative h-screen overflow-hidden bg-page">
       {/* Swooping indigo line (drawn by scroll) */}
+      {/* Own compositor layer: the 90px stroke repaints on every scrolled frame,
+          and without this the name list and preview card repaint with it. */}
       <svg
         className="absolute inset-0 w-full h-full z-0 pointer-events-none"
         viewBox="0 0 1440 900"
         preserveAspectRatio="none"
         aria-hidden="true"
+        style={{ transform: 'translateZ(0)', willChange: 'transform' }}
       >
         <path
           ref={pathRef}
@@ -224,7 +243,10 @@ export function ProjectSection() {
                 <div
                   key={p.title}
                   className="flex items-center border-t border-edge-subtle"
-                  style={{ height: ROW_GAP }}
+                  // Rows have an explicit fixed height, so containing layout
+                  // cannot change their geometry — it just stops the font-size
+                  // transition from relayouting the track and the document.
+                  style={{ height: ROW_GAP, contain: 'layout' }}
                 >
                   <TextGlitch
                     ref={(el) => { titleRefs.current[i] = el; }}
@@ -232,7 +254,12 @@ export function ProjectSection() {
                     trigger={false}
                     duration={0.5}
                     speed={0.03}
-                    className={`font-bold tracking-tight leading-none transition-all duration-500 ${
+                    // This carried `transition-all duration-500`, but it never
+                    // ran: TextGlitch recreated its DOM node on every render, and
+                    // CSS transitions can't survive a remount. Now that the node
+                    // persists the class would suddenly start animating font-size
+                    // — a visual change — so it is removed to keep the snap.
+                    className={`font-bold tracking-tight leading-none ${
                       i === active ? 'text-heading' : 'text-dim'
                     }`}
                     style={{ fontSize: i === active ? 'clamp(2.6rem, 5vw, 5rem)' : 'clamp(1.6rem, 3vw, 3rem)' }}
@@ -262,12 +289,22 @@ export function ProjectSection() {
               <span className="type-label text-muted group-hover:text-heading transition-colors duration-300">Preview</span>
             </div>
 
+            {/* All four previews are mounted and stacked, with only the active
+                one opaque. Swapping the src on a single <img> meant a network
+                fetch + PNG decode mid-scroll on every project change. */}
             <div className="relative w-full h-full overflow-hidden">
-              <img
-                src={project.image}
-                alt={project.title}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
+              {projects.map((p, i) => (
+                <Image
+                  key={p.title}
+                  src={p.image}
+                  alt={p.title}
+                  aria-hidden={i !== active}
+                  fill
+                  sizes="32vw"
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{ opacity: i === active ? 1 : 0 }}
+                />
+              ))}
             </div>
 
             {/* tech line under the card */}

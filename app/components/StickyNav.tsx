@@ -48,7 +48,13 @@ export function StickyNav() {
         borderColor: 'var(--color-glass-border)',
         opacity: !visible ? 0 : hovered ? 1 : 0.70,
         pointerEvents: visible ? 'auto' : 'none',
-        transition: 'opacity 0.4s ease',
+        // A backdrop-filter at opacity 0 is still composited every frame, so
+        // this blurred the page for the whole first 80vh of scroll. visibility
+        // is delayed on hide so the 0.4s fade out is unchanged.
+        visibility: visible ? 'visible' : 'hidden',
+        transition: visible
+          ? 'opacity 0.4s ease, visibility 0s'
+          : 'opacity 0.4s ease, visibility 0s linear 0.4s',
       }}
       className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex gap-5 md:gap-8 px-5 md:px-6 py-3 border"
       aria-label="Section navigation"

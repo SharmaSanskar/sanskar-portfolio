@@ -3,7 +3,6 @@
 import React, { useRef, useState } from 'react';
 import { Mail, Github, BookOpen, Twitter, Linkedin } from 'lucide-react';
 import { motion } from 'motion/react';
-import emailjs from '@emailjs/browser';
 
 interface ContactSectionProps {
   isRevealed?: boolean;
@@ -18,7 +17,9 @@ export function ContactSection({ isRevealed = true }: ContactSectionProps) {
 
   const [status, setStatus] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Loaded on submit rather than statically — ContactSection renders on first
+  // paint, so a static import put the whole SDK in the initial bundle.
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || '';
@@ -31,13 +32,14 @@ export function ContactSection({ isRevealed = true }: ContactSectionProps) {
       message: formData.message,
     };
 
-    emailjs
-      .send(serviceId, templateId, templateParams, publicKey)
-      .then(() => {
-        setStatus('Message sent successfully!');
-        setFormData({ name: '', email: '', message: '' });
-      })
-      .catch(() => setStatus('Failed to send message. Try again later.'));
+    try {
+      const emailjs = (await import('@emailjs/browser')).default;
+      await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      setStatus('Message sent successfully!');
+      setFormData({ name: '', email: '', message: '' });
+    } catch {
+      setStatus('Failed to send message. Try again later.');
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

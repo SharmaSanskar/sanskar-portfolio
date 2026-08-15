@@ -19,6 +19,27 @@ type TextScrambleProps = {
 const defaultChars =
   'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
+/**
+ * `motion.create()` is NOT memoized by Motion's proxy (only `motion.div`-style
+ * property access is). Calling it in a render body returns a new component type
+ * every render, which makes React unmount and remount the whole subtree — once
+ * per scramble tick. Cache by tag so each tag maps to one stable component.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type MotionTagComponent = React.ComponentType<any>;
+
+const motionComponentCache = new Map<string, MotionTagComponent>();
+
+function getMotionComponent(tag: React.ElementType): MotionTagComponent {
+  const key = typeof tag === 'string' ? tag : 'p';
+  let cached = motionComponentCache.get(key);
+  if (!cached) {
+    cached = motion.create(key as keyof JSX.IntrinsicElements) as MotionTagComponent;
+    motionComponentCache.set(key, cached);
+  }
+  return cached;
+}
+
 export type TextGlitchHandle = {
   scrambleTo: (target?: string, persist?: boolean) => void;
   element?: HTMLElement | null;
@@ -40,16 +61,22 @@ export const TextGlitch = forwardRef<TextGlitchHandle, TextScrambleProps>(
     },
     ref
   ) {
-    const MotionComponent = motion.create(
-      Component as keyof JSX.IntrinsicElements
-    ) as React.ComponentType<any>;
+    const MotionComponent = getMotionComponent(Component);
 
     const elementRef = useRef<HTMLElement | null>(null);
     const intervalRef = useRef<number | null>(null);
 
     const [baseText, setBaseText] = useState(children ?? textProp ?? '');
     const [displayText, setDisplayText] = useState(baseText);
-    const [isAnimating, setIsAnimating] = useState(false);
+
+    // Per-tick frames are written straight to the DOM instead of through React
+    // state — a full render pass every 30ms was the bulk of the scramble cost.
+    // React state still holds the settled text, so SSR output and prop-sync are
+    // unchanged, and React won't clobber our writes (it only patches children
+    // when `displayText` itself changes).
+    const paint = useCallback((value: string) => {
+      if (elementRef.current) elementRef.current.textContent = value;
+    }, []);
 
     // keep in sync with incoming props
     useEffect(() => {
@@ -65,8 +92,6 @@ export const TextGlitch = forwardRef<TextGlitchHandle, TextScrambleProps>(
           clearInterval(intervalRef.current);
           intervalRef.current = null;
         }
-
-        setIsAnimating(true);
 
         const src = baseText;
         const tgt = target ?? baseText;
@@ -94,7 +119,7 @@ export const TextGlitch = forwardRef<TextGlitchHandle, TextScrambleProps>(
             }
           }
 
-          setDisplayText(scrambled);
+          paint(scrambled);
           step++;
 
           if (step > steps) {
@@ -102,14 +127,14 @@ export const TextGlitch = forwardRef<TextGlitchHandle, TextScrambleProps>(
               clearInterval(intervalRef.current);
               intervalRef.current = null;
             }
+            paint(tgt);
             setDisplayText(tgt);
-            setIsAnimating(false);
             if (persist) setBaseText(tgt);
             onScrambleComplete?.();
           }
         }, speed * 1000);
       },
-      [baseText, characterSet, duration, speed, onScrambleComplete]
+      [baseText, characterSet, duration, speed, onScrambleComplete, paint]
     );
 
     useImperativeHandle(
@@ -125,6 +150,11 @@ export const TextGlitch = forwardRef<TextGlitchHandle, TextScrambleProps>(
       if (!trigger) return;
       scrambleTo(undefined, true);
     }, [trigger, scrambleTo]);
+
+    // The scramble interval previously outlived unmount.
+    useEffect(() => () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    }, []);
 
     return (
       <MotionComponent ref={elementRef as any} className={className} {...props}>

@@ -1,7 +1,9 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
+import Image from 'next/image';
 import { gsap } from 'gsap';
+import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ContactSection } from './ContactSection';
 
@@ -15,7 +17,7 @@ export default function AboutContactSection() {
   const aboutContentRef = useRef<HTMLDivElement>(null);
   const [contactRevealed, setContactRevealed] = useState(false);
 
-  useEffect(() => {
+  useGSAP(() => {
     const container = containerRef.current;
     const about = aboutRef.current;
     const heading = headingRef.current;
@@ -93,12 +95,15 @@ export default function AboutContactSection() {
         onReverseComplete: () => { about.style.pointerEvents = ''; setContactRevealed(false); },
       }, '+=0.1');
 
+    // Only tear down what this section owns. This previously called
+    // ScrollTrigger.getAll().forEach(t => t.kill()), which also destroyed the
+    // triggers belonging to WorkSection and ProjectSection.
     return () => {
+      tl.scrollTrigger?.kill();
       tl.kill();
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
       window.removeEventListener('resize', setPortalOrigin);
     };
-  }, []);
+  }, { scope: containerRef });
 
   return (
     <div ref={containerRef} className="relative h-screen">
@@ -140,25 +145,29 @@ export default function AboutContactSection() {
               {/* Image 1 — starts higher */}
               <div
                 data-reveal
-                className="w-1/2 aspect-[3/4] overflow-hidden flex-shrink-0"
+                className="relative w-1/2 aspect-[3/4] overflow-hidden flex-shrink-0"
                 style={{ border: '1px solid var(--color-accent-soft)' }}
               >
-                <img
+                <Image
                   src="/about/photo1.jpg"
                   alt="Sanskar"
-                  className="w-full h-full object-cover"
+                  fill
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                  className="object-cover"
                 />
               </div>
               {/* Image 2 — offset down */}
               <div
                 data-reveal
-                className="w-1/2 aspect-[3/4] overflow-hidden flex-shrink-0 mt-10"
+                className="relative w-1/2 aspect-[3/4] overflow-hidden flex-shrink-0 mt-10"
                 style={{ border: '1px solid var(--color-accent-soft)' }}
               >
-                <img
+                <Image
                   src="/about/photo2.jpg"
                   alt="Sanskar"
-                  className="w-full h-full object-cover"
+                  fill
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                  className="object-cover"
                 />
               </div>
             </div>

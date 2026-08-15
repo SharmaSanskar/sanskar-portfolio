@@ -35,9 +35,15 @@ export function Cursor() {
     // Only setState when variant/label actually change (no per-frame re-renders).
     let lastV: Variant = 'default';
     let lastL = '';
-    const move = (e: MouseEvent) => {
-      x.set(e.clientX); y.set(e.clientY);
-      const target = (e.target as HTMLElement | null)?.closest('a, button, [data-cursor]');
+    let pendingTarget: HTMLElement | null = null;
+    let rafId: number | null = null;
+
+    // The hit-test below is a DOM walk plus selector match; a trackpad fires
+    // mousemove at 120Hz+, so it runs at most once per frame. Position still
+    // updates on the raw event — the springs are already rAF-driven.
+    const hitTest = () => {
+      rafId = null;
+      const target = pendingTarget?.closest('a, button, [data-cursor]');
       let v: Variant = 'default';
       let l = '';
       if (target) {
@@ -48,9 +54,16 @@ export function Cursor() {
       if (l !== lastL) { lastL = l; setLabel(l); }
     };
 
+    const move = (e: MouseEvent) => {
+      x.set(e.clientX); y.set(e.clientY);
+      pendingTarget = e.target as HTMLElement | null;
+      if (rafId === null) rafId = requestAnimationFrame(hitTest);
+    };
+
     window.addEventListener('mousemove', move);
     return () => {
       window.removeEventListener('mousemove', move);
+      if (rafId !== null) cancelAnimationFrame(rafId);
       document.body.classList.remove('cursor-none');
     };
   }, [reduce, x, y]);

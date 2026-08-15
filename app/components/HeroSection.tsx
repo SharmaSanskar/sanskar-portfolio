@@ -58,6 +58,7 @@ export function HeroSection() {
   const [roleVisible, setRoleVisible] = useState(false);
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
   const [isDark, setIsDark] = useState(true);
+  const [shaderActive, setShaderActive] = useState(true);
   const glitchRef = useRef<TextGlitchHandle>(null);
 
   const { scrollYProgress } = useScroll({
@@ -76,7 +77,10 @@ export function HeroSection() {
   const nameY = useTransform(scrollYProgress, [0, 0.28, 0.5], ['0vh', '-30vh', '-38vh']);
   const nameScale = useTransform(scrollYProgress, [0.3, 0.5], [1, 1.18]);
   const nameBlur = useTransform(scrollYProgress, [0.3, 0.5], ['blur(0px)', 'blur(18px)']);
-  const nameLetter = useTransform(scrollYProgress, [0.3, 0.5], ['0em', '0.4em']);
+  // NOTE: a `letterSpacing` 0em→0.4em transform used to live here and was applied
+  // to the name container. It never reached a glyph — letter-spacing is inherited,
+  // and both RevealText children below set `tracking-tight`, which overrides it.
+  // It was a per-frame style invalidation across the subtree for zero pixels.
   const nameOpacity = useTransform(scrollYProgress, [0.34, 0.5], [1, 0]);
 
   // Description lines (after the name has dissolved)
@@ -90,6 +94,9 @@ export function HeroSection() {
   // Marquee
   const marqueeOpacity = useTransform(scrollYProgress, [0.82, 0.92], [0, 1]);
   const marqueeY = useTransform(scrollYProgress, [0.82, 0.92], [24, 0]);
+  // Its backdrop-filter blurs the live WebGL canvas every frame even at opacity
+  // 0. It is invisible until 0.82, so hide it outright until then.
+  const marqueeVisibility = useTransform(marqueeOpacity, (o) => (o === 0 ? 'hidden' : 'visible'));
 
   useEffect(() => {
     const update = () => setIsDark(document.documentElement.dataset.theme !== 'light');
@@ -102,6 +109,19 @@ export function HeroSection() {
   useEffect(() => {
     const t = setTimeout(() => setRoleVisible(true), 1400);
     return () => clearTimeout(t);
+  }, []);
+
+  // Stop the WebGL loop once the hero is fully scrolled past — it is invisible
+  // there, but ShaderMount would otherwise keep rendering for the whole page.
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setShaderActive(entry.isIntersecting),
+      { rootMargin: '200px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -128,7 +148,7 @@ export function HeroSection() {
           className="absolute inset-0 z-0"
         >
           <motion.div style={{ scale: shaderScale }} className="w-full h-full">
-            <PaperShader colors={isDark ? shaderColors.dark : shaderColors.light} speed={0.32} />
+            <PaperShader colors={isDark ? shaderColors.dark : shaderColors.light} speed={0.32} active={shaderActive} />
           </motion.div>
         </motion.div>
 
@@ -182,7 +202,7 @@ export function HeroSection() {
 
           {/* Split-baseline name — rises to center on scroll, then disintegrates */}
           <motion.div
-            style={{ y: nameY, scale: nameScale, filter: nameBlur, letterSpacing: nameLetter, opacity: nameOpacity }}
+            style={{ y: nameY, scale: nameScale, filter: nameBlur, opacity: nameOpacity }}
             className="flex flex-col md:flex-row md:items-end md:justify-between gap-x-6 gap-y-1 mb-8 md:mb-10 origin-center will-change-transform"
           >
             <RevealText
@@ -277,6 +297,7 @@ export function HeroSection() {
           style={{
             opacity: marqueeOpacity,
             y: marqueeY,
+            visibility: marqueeVisibility,
             background: 'var(--color-glass)',
             backdropFilter: 'blur(15px)',
             WebkitBackdropFilter: 'blur(15px)',
@@ -285,10 +306,12 @@ export function HeroSection() {
           className="absolute bottom-0 left-0 right-0 z-30 overflow-hidden py-5 border-t"
           aria-hidden="true"
         >
-          <motion.div
-            animate={{ x: ['0%', '-50%'] }}
-            transition={{ duration: 28, ease: 'linear', repeat: Infinity, repeatType: 'loop' }}
-            className="flex items-center"
+          {/* `.marquee-run` in globals.css has identical keyframes, duration and
+              easing, but runs on the compositor. As a JS animation this ticked on
+              the main thread for the whole session, including ~900vh after the
+              hero had left the screen. */}
+          <div
+            className="flex items-center marquee-run"
             style={{ width: 'max-content' }}
           >
             {[0, 1].map(set => (
@@ -308,7 +331,7 @@ export function HeroSection() {
                 )}
               </div>
             ))}
-          </motion.div>
+          </div>
         </motion.div>
 
       </div>
