@@ -6,6 +6,8 @@ import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ContactSection } from './ContactSection';
+import { ChapterLabel } from './ChapterLabel';
+import { SCRUB } from '@/app/constants/motion';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,7 +16,9 @@ export default function AboutContactSection() {
   const aboutRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const portalRef = useRef<HTMLSpanElement>(null);
+  const greetLabelRef = useRef<HTMLDivElement>(null);
   const aboutContentRef = useRef<HTMLDivElement>(null);
+  const contactRef = useRef<HTMLDivElement>(null);
   const [contactRevealed, setContactRevealed] = useState(false);
 
   useGSAP(() => {
@@ -22,8 +26,9 @@ export default function AboutContactSection() {
     const about = aboutRef.current;
     const heading = headingRef.current;
     const aboutContent = aboutContentRef.current;
+    const contact = contactRef.current;
 
-    if (!container || !about || !heading || !aboutContent) return;
+    if (!container || !about || !heading || !aboutContent || !contact) return;
 
     const setPortalOrigin = () => {
       const portal = portalRef.current;
@@ -40,9 +45,11 @@ export default function AboutContactSection() {
 
     setPortalOrigin();
     const revealEls = aboutContent.querySelectorAll('[data-reveal]');
-    // Section itself does not move — only its bg appears (seamlessly, since its
-    // color matches the "Hello there" text). The elements materialize in.
+    // Everything sits on the shared page canvas. Zooming through the "T" floods
+    // the screen with light for a beat, which then dissolves back into the dark
+    // canvas as the About content materialises — no separate panel colour.
     gsap.set(aboutContent, { opacity: 0 });
+    gsap.set(contact, { autoAlpha: 0, y: '6vh' });
     gsap.set(revealEls, { autoAlpha: 0, filter: 'blur(14px)', scale: 1.06 });
     window.addEventListener('resize', setPortalOrigin);
 
@@ -52,12 +59,19 @@ export default function AboutContactSection() {
         start: 'top top',
         end: '+=300%',
         pin: true,
-        scrub: 1,
+        scrub: SCRUB,
         anticipatePin: 1,
       }
     });
 
     tl
+      // The chapter label introduces the greeting, then steps aside for the zoom.
+      .to(greetLabelRef.current, {
+        autoAlpha: 0,
+        y: -24,
+        duration: 0.06,
+        ease: 'power1.in',
+      })
       .to(heading, {
         scale: 20,
         duration: 0.4,
@@ -70,12 +84,12 @@ export default function AboutContactSection() {
       })
       .to(heading, {
         opacity: 0,
-        duration: 0.05,
-        ease: 'none',
+        duration: 0.1,
+        ease: 'power1.out',
       })
       .to(aboutContent, {
         opacity: 1,
-        duration: 0.04,
+        duration: 0.06,
         ease: 'none'
       }, '<')
       .to(revealEls, {
@@ -86,14 +100,23 @@ export default function AboutContactSection() {
         stagger: 0.05,
         ease: 'power2.out'
       }, '<0.02')
+      // Handoff: About lifts and fades while Contact rises into the same space.
       .to(about, {
-        yPercent: -100,
-        duration: 0.33,
-        ease: 'power2.inOut',
+        y: '-12vh',
+        autoAlpha: 0,
+        duration: 0.3,
+        ease: 'power2.in',
+      }, '+=0.12')
+      // Contact starts rising as About finishes leaving — a relay, never both
+      // chapters' content on screen at once.
+      .to(contact, {
+        y: 0,
+        autoAlpha: 1,
+        duration: 0.3,
+        ease: 'power2.out',
         onStart: () => { setContactRevealed(true); },
-        onComplete: () => { about.style.pointerEvents = 'none'; },
-        onReverseComplete: () => { about.style.pointerEvents = ''; setContactRevealed(false); },
-      }, '+=0.1');
+        onReverseComplete: () => { setContactRevealed(false); },
+      }, '-=0.06');
 
     // Only tear down what this section owns. This previously called
     // ScrollTrigger.getAll().forEach(t => t.kill()), which also destroyed the
@@ -110,16 +133,19 @@ export default function AboutContactSection() {
       {/* ABOUT SECTION */}
       <div
         ref={aboutRef}
-        className="absolute inset-0 z-10 bg-section overflow-hidden"
+        className="absolute inset-0 z-10 overflow-hidden"
       >
         {/* Initial Greeting */}
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 md:gap-8">
+          <div ref={greetLabelRef}>
+            <ChapterLabel index={3}>About</ChapterLabel>
+          </div>
           <h1
             ref={headingRef}
             className="type-greeting text-heading"
           >
             Hello <span className="inline-block">
-              <span ref={portalRef} className="inline-block">T</span>here <span className="text-accent">:)</span>
+              <span ref={portalRef} className="inline-block">T</span>here <span className="wink text-accent" aria-label=":)"><span className="wink-open" aria-hidden="true">:)</span><span className="wink-shut" aria-hidden="true">;)</span></span>
             </span>
           </h1>
         </div>
@@ -127,12 +153,12 @@ export default function AboutContactSection() {
         {/* About Content */}
         <div
           ref={aboutContentRef}
-          className="absolute inset-0 flex flex-col justify-center px-6 md:px-20 gap-6 md:gap-16 bg-heading"
+          className="absolute inset-0 flex flex-col justify-center px-gutter pt-24 pb-8 gap-8 md:gap-14"
         >
           {/* Top — Main Statement */}
           <h2
             data-reveal
-            className="type-statement text-2xl md:text-6xl text-center text-heading-inv"
+            className="type-statement text-[1.6rem] md:text-5xl lg:text-6xl md:text-center text-heading max-w-5xl md:mx-auto"
           >
             I build <span className="text-accent">scalable software</span> that turns complex problems into simple, reliable products.
           </h2>
@@ -141,11 +167,11 @@ export default function AboutContactSection() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-start">
 
             {/* Left — Staggered portrait images */}
-            <div className="flex gap-4 items-start">
-              {/* Image 1 — starts higher */}
+            <div className="flex gap-3 md:gap-4 items-start md:h-[42vh]">
+              {/* Image 1 */}
               <div
                 data-reveal
-                className="relative w-1/2 aspect-[3/4] overflow-hidden flex-shrink-0"
+                className="relative w-1/2 md:w-auto md:h-full aspect-[4/5] md:aspect-[3/4] overflow-hidden flex-shrink-0"
                 style={{ border: '1px solid var(--color-accent-soft)' }}
               >
                 <Image
@@ -156,10 +182,10 @@ export default function AboutContactSection() {
                   className="object-cover"
                 />
               </div>
-              {/* Image 2 — offset down */}
+              {/* Image 2 — offset down for the stagger */}
               <div
                 data-reveal
-                className="relative w-1/2 aspect-[3/4] overflow-hidden flex-shrink-0 mt-10"
+                className="relative w-1/2 md:w-auto md:h-full aspect-[4/5] md:aspect-[3/4] overflow-hidden flex-shrink-0 mt-8 md:mt-14"
                 style={{ border: '1px solid var(--color-accent-soft)' }}
               >
                 <Image
@@ -173,10 +199,10 @@ export default function AboutContactSection() {
             </div>
 
             {/* Right — Two indented paragraphs */}
-            <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-5 md:gap-8">
               <p
                 data-reveal
-                className="type-body text-body-inv indent-6 md:indent-12"
+                className="type-body text-secondary md:indent-12"
               >
                 I'm Sanskar Sharma, a CS grad student at Northeastern University. I like
                 building products end-to-end—taking an idea, stressing it, breaking it,
@@ -184,7 +210,7 @@ export default function AboutContactSection() {
               </p>
               <p
                 data-reveal
-                className="type-body text-body-inv indent-6 md:indent-12"
+                className="type-body text-secondary md:indent-12"
               >
                 Most of my time goes into writing code, fixing things I thought were already
                 fixed, and chasing that one bug that refuses to exist when I look at it. When
@@ -197,7 +223,7 @@ export default function AboutContactSection() {
       </div>
 
       {/* CONTACT SECTION */}
-      <div className="absolute inset-0 bg-page">
+      <div ref={contactRef} className="absolute inset-0 overflow-hidden">
         <ContactSection isRevealed={contactRevealed} />
       </div>
     </div>

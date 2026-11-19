@@ -36,12 +36,15 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     <ReactLenis
       root
       options={{
-        // duration + easing (NOT lerp) gives the flowing "release and glide" feel.
-        duration: 1.5,
-        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        // lerp gives a continuous glide that never "lands" abruptly, and keeps
+        // wheel travel 1:1 so pinned chapters advance at a predictable pace.
+        lerp: 0.085,
         smoothWheel: true,
-        wheelMultiplier: 1.7, // more travel per wheel tick (move more on a little scroll)
-        touchMultiplier: 2.2,
+        wheelMultiplier: 1,
+        // Touch stays native: momentum scrolling on phones already feels right,
+        // and syncing it through Lenis adds input lag.
+        syncTouch: false,
+        anchors: { offset: 0, duration: 1.6 },
         autoRaf: false, // we drive raf from gsap.ticker above
       }}
       ref={lenisRef}

@@ -3,7 +3,7 @@ import { Inter, JetBrains_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { SmoothScroll } from "./components/SmoothScroll";
 import { ThemeToggle } from "./components/ThemeToggle";
-import { Cursor } from "./components/Cursor";
+import { HoverPill } from "./components/HoverPill";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -45,7 +45,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: `(function(){var t=localStorage.getItem('theme')||(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);})();` }} />
       </head>
       <body className={`${inter.variable} ${jetbrainsMono.variable} ${playfair.variable} antialiased`} suppressHydrationWarning>
-        <Cursor />
+        <HoverPill />
         <ThemeToggle />
         <SmoothScroll>
           {children}

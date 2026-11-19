@@ -1,13 +1,19 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { TextGlitch, type TextGlitchHandle } from './TextGlitch';
+import { ChapterLabel } from './ChapterLabel';
+import { SCRUB } from '@/app/constants/motion';
+import { paletteMix, workProgressToMix } from '@/app/constants/backdrop';
 
 gsap.registerPlugin(ScrollTrigger);
+// Mobile address-bar show/hide resizes the viewport; without this every pinned
+// section re-measures mid-swipe and jumps.
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 interface WorkExperience {
   company: string;
@@ -41,195 +47,220 @@ const experiences: WorkExperience[] = [
   },
 ];
 
+const pad = (n: number) => String(n).padStart(2, '0');
+
+/**
+ * Experience as a horizontal filmstrip: the chapter pins and the strip slides
+ * sideways as you scroll down. Each role gets a full panel with every detail
+ * visible. The strip's progress also drives the page-wide backdrop's one
+ * colour change (Ink → Brass), so the morph happens while you travel through
+ * the roles and then holds for the rest of the site.
+ */
 export function WorkSection() {
   const sectionRef = useRef<HTMLElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const fillRef = useRef<HTMLDivElement>(null);
+  const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const nameRefs = useRef<(TextGlitchHandle | null)[]>([]);
   const [titleTrigger, setTitleTrigger] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const backdropRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<TextGlitchHandle | null>(null);
+  const [reduce, setReduce] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const apply = () => setReduce(mq.matches);
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  }, []);
 
   useGSAP(
     () => {
-      if (!sectionRef.current || !containerRef.current) return;
-
       const section = sectionRef.current;
-      const container = containerRef.current;
+      const track = trackRef.current;
+      if (!section || !track) return;
+
+      // Reduced motion: no strip, but the backdrop still changes colour across
+      // the section, so every visitor gets the same two-gradient story.
+      if (reduce) {
+        ScrollTrigger.create({
+          trigger: section,
+          start: 'top 80%',
+          end: 'bottom 40%',
+          onUpdate: (self) => paletteMix.set(workProgressToMix(self.progress)),
+          onLeave: () => paletteMix.set(1),
+          onLeaveBack: () => paletteMix.set(0),
+        });
+        return;
+      }
 
       ScrollTrigger.create({
         trigger: section,
-        start: 'top center',
+        start: 'top 60%',
         once: true,
         onEnter: () => setTitleTrigger(true),
       });
 
-      ScrollTrigger.create({
-        trigger: section,
-        start: 'top top',
-        end: '+=150%',
-        pin: true,
-        pinSpacing: true,
+      const mm = gsap.matchMedia();
+      mm.add({ mobile: '(max-width: 767px)', desktop: '(min-width: 768px)' }, (ctx) => {
+        const { mobile } = ctx.conditions as { mobile: boolean };
+        const distance = () => track.scrollWidth - window.innerWidth;
+        // Phones cover the strip's (narrower) pixel width more slowly per swipe,
+        // so the panels don't fly past.
+        const pace = mobile ? 2.2 : 1.25;
+
+        const strip = gsap.to(track, {
+          x: () => -distance(),
+          ease: 'none',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top top',
+            end: () => `+=${distance() * pace}`,
+            pin: true,
+            scrub: SCRUB,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => {
+              if (fillRef.current) fillRef.current.style.transform = `scaleX(${self.progress})`;
+              paletteMix.set(workProgressToMix(self.progress));
+            },
+            // A nav jump can skip the strip entirely; land on the right palette.
+            onLeave: () => paletteMix.set(1),
+            onLeaveBack: () => paletteMix.set(0),
+          },
+        });
+
+        experiences.forEach((exp, i) => {
+          const panel = panelRefs.current[i];
+          if (!panel) return;
+
+          // The company name glitches as its panel settles into view.
+          ScrollTrigger.create({
+            trigger: panel,
+            containerAnimation: strip,
+            start: 'left 60%',
+            end: 'right 40%',
+            onEnter: () => nameRefs.current[i]?.scrambleTo(exp.company, true),
+            onEnterBack: () => nameRefs.current[i]?.scrambleTo(exp.company, true),
+          });
+        });
       });
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: 'top top',
-          end: '+=100%',
-          scrub: 0.5,
-        },
-      });
-
-      tl.fromTo(container,
-        { x: '100vw', opacity: 0 },
-        { x: 0, opacity: 1, ease: 'none' }
-      );
-
-      // Was a backgroundColor tween on the <section>, which repainted the whole
-      // viewport — and the raster of every child — on each scrubbed frame.
-      // Both colors are opaque, so fading section-start out over a page-colored
-      // section is the same sRGB lerp, but opacity is compositor-only.
-      tl.fromTo(backdropRef.current,
-        { opacity: 1 },
-        { opacity: 0, ease: 'none' },
-        0
-      );
+      return () => mm.revert();
     },
-    { scope: sectionRef }
+    { scope: sectionRef, dependencies: [reduce], revertOnUpdate: true }
   );
 
+  // ── Reduced motion: a calm vertical list, nothing moves sideways ──
+  if (reduce) {
+    return (
+      <section ref={sectionRef} className="relative px-gutter pt-chapter pb-28">
+        <ChapterLabel index={1}>Experience</ChapterLabel>
+        <h2 className="type-display text-heading mt-6">WORK</h2>
+        <div className="mt-14 grid gap-16 md:grid-cols-2">
+          {experiences.map((exp, i) => (
+            <RolePanelContent key={exp.company} exp={exp} index={i} />
+          ))}
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section ref={sectionRef} className="relative h-screen overflow-hidden" style={{ backgroundColor: 'var(--color-page)' }}>
-      <div
-        ref={backdropRef}
-        aria-hidden="true"
-        className="absolute inset-0 z-0"
-        style={{ backgroundColor: 'var(--color-section-start)', willChange: 'opacity' }}
-      />
-      <div className="h-screen relative">
-        {/* WORK Title */}
-        <div className="absolute top-12 md:top-20 left-6 md:left-20 z-10">
-          <TextGlitch
-            ref={titleRef}
-            trigger={titleTrigger}
-            className="type-display text-heading"
-            as="h2"
-          >
+    <section ref={sectionRef} className="relative h-screen overflow-hidden">
+      <div ref={trackRef} className="relative z-10 flex h-full w-max will-change-transform">
+        {/* Intro panel */}
+        <div className="w-screen md:w-[62vw] h-full flex flex-col px-gutter pt-chapter pb-24 flex-shrink-0">
+          <ChapterLabel index={1}>Experience</ChapterLabel>
+          <TextGlitch trigger={titleTrigger} className="type-display text-heading mt-5 md:mt-6" as="h2">
             WORK
           </TextGlitch>
+          <p className="mt-auto type-label text-muted flex items-center gap-3" aria-hidden="true">
+            Keep scrolling
+            <span className="text-accent animate-nudge-x">→</span>
+          </p>
         </div>
 
-        {/* Cards Container */}
-        <div
-          ref={containerRef}
-          className="absolute top-36 md:top-72 left-6 md:left-20 right-6 md:right-20 grid grid-cols-1 md:grid-cols-2 gap-8 will-change-transform"
-        >
-          {experiences.map((exp, idx) => (
-            <div
-              key={exp.company}
-              onMouseEnter={() => titleRef.current?.scrambleTo(exp.company, false)}
-              onMouseLeave={() => titleRef.current?.scrambleTo()}
-              onClick={() => titleRef.current?.scrambleTo(exp.company, false)}
-            >
-              <WorkCard experience={exp} />
-            </div>
-          ))}
+        {/* One panel per role */}
+        {experiences.map((exp, i) => (
+          <div
+            key={exp.company}
+            ref={(el) => { panelRefs.current[i] = el; }}
+            className="w-[88vw] md:w-[78vw] h-full flex items-center px-gutter pt-20 md:pt-0 flex-shrink-0"
+          >
+            <RolePanelContent
+              exp={exp}
+              index={i}
+              nameRef={(el) => { nameRefs.current[i] = el; }}
+            />
+          </div>
+        ))}
+
+        {/* Outro sliver — the strip hands off downward */}
+        <div className="w-[45vw] md:w-[28vw] h-full flex items-center px-gutter flex-shrink-0">
+          <p className="type-label text-muted leading-loose">
+            Next<br />
+            <span className="text-secondary">Selected projects</span>{' '}
+            <span className="text-accent inline-block animate-nudge-y">↓</span>
+          </p>
+        </div>
+      </div>
+
+      {/* Progress hairline */}
+      <div className="absolute z-20 bottom-8 md:bottom-10 left-0 right-0 px-gutter" aria-hidden="true">
+        <div className="relative h-px bg-edge">
+          <div ref={fillRef} className="absolute inset-0 bg-accent origin-left" style={{ transform: 'scaleX(0)' }} />
+        </div>
+        <div className="mt-3 flex justify-between type-label text-muted tabular-nums">
+          <span>{experiences[experiences.length - 1].period.split(' - ')[0]}</span>
+          <span>{experiences[0].period.split(' - ')[1]}</span>
         </div>
       </div>
     </section>
   );
 }
 
-function WorkCard({ experience }: { experience: WorkExperience }) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const detailsRef = useRef<HTMLDivElement>(null);
-  const logoBoxRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const textGroupRef = useRef<HTMLDivElement>(null);
-
-  const handleLogoClick = () => {
-    if (!logoBoxRef.current || !textGroupRef.current || !titleRef.current) return;
-
-    const boxHeight = logoBoxRef.current.offsetHeight;
-    const titleHeight = titleRef.current.offsetHeight;
-    const moveUpDistance = boxHeight - titleHeight;
-
-    setIsExpanded(!isExpanded);
-
-    gsap.to(textGroupRef.current, {
-      y: !isExpanded ? -moveUpDistance : 0,
-      duration: 0.7,
-      ease: "power3.inOut"
-    });
-
-    if (!isExpanded) {
-      gsap.fromTo(detailsRef.current,
-        { opacity: 0, y: 60 },
-        { opacity: 1, y: 24, duration: 0.5, delay: 0.3, ease: "power2.out" }
-      );
-    } else {
-      gsap.to(detailsRef.current, { opacity: 0, y: 60, duration: 0.3 });
-    }
-  };
-
+function RolePanelContent({
+  exp,
+  index,
+  nameRef,
+}: {
+  exp: WorkExperience;
+  index: number;
+  nameRef?: (el: TextGlitchHandle | null) => void;
+}) {
   return (
-    <div className="flex flex-col gap-2">
-      <div className="type-label text-muted">
-        {experience.period}
+    <div className="w-full grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 md:gap-16 items-center">
+      <div className="group relative w-20 h-20 md:w-64 md:h-64 lg:w-80 lg:h-80 overflow-hidden border border-edge flex-shrink-0">
+        <Image
+          src={exp.logo}
+          alt={exp.company}
+          fill
+          sizes="(max-width: 768px) 80px, 320px"
+          className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+        />
       </div>
 
-      <div className="flex items-end gap-6 md:gap-8">
-        {/* LOGO BOX */}
-        <div
-          ref={logoBoxRef}
-          data-cursor={isExpanded ? 'Close' : 'View'}
-          className="w-28 h-28 md:w-64 md:h-64 lg:w-80 lg:h-80 flex items-center justify-center border border-edge/40 flex-shrink-0 relative cursor-pointer bg-page overflow-hidden"
-          onClick={handleLogoClick}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
+      <div>
+        <p className="type-label text-accent tabular-nums">
+          {pad(index + 1)} / {pad(experiences.length)}
+          <span className="text-muted ml-4">{exp.period}</span>
+        </p>
+        <TextGlitch
+          ref={nameRef}
+          as="h3"
+          trigger={false}
+          duration={0.6}
+          speed={0.03}
+          className="font-bold text-heading tracking-tight leading-none mt-4 md:mt-5"
+          style={{ fontSize: 'clamp(2.4rem, 6.5vw, 6.5rem)' }}
         >
-          {experience.logo ? (
-            <Image
-              src={experience.logo}
-              alt={experience.company}
-              fill
-              sizes="(max-width: 768px) 112px, (max-width: 1024px) 256px, 320px"
-              className={`object-cover transition-transform duration-500 ease-out ${
-                isHovered ? 'scale-110' : 'scale-100'
-              }`}
-            />
-          ) : (
-            <div className="text-5xl md:text-6xl text-dim font-bold">
-              {experience.company.charAt(0)}
-            </div>
-          )}
-
-        </div>
-
-        {/* TEXT AREA */}
-        <div className="relative flex-1 flex flex-col justify-end">
-          <div ref={textGroupRef} className="will-change-transform">
-            <h3 
-              ref={titleRef}
-              className="type-section-heading text-heading whitespace-nowrap"
-            >
-              {experience.company}
-            </h3>
-
-            <div
-              ref={detailsRef}
-              className="space-y-3 pointer-events-none opacity-0 absolute top-full left-0"
-            >
-              {experience.details.map((detail, index) => (
-                <ul key={index} className="list-disc text-sm text-secondary">
-                  <li>
-                    {detail}
-                  </li>
-                </ul>
-              ))}
-            </div>
-          </div>
-        </div>
+          {exp.company}
+        </TextGlitch>
+        <ul className="mt-6 md:mt-10 grid gap-3 md:gap-x-10 md:gap-y-4 md:grid-cols-2 border-l md:border-l-0 md:border-t border-edge-strong pl-5 md:pl-0 md:pt-8 max-w-4xl">
+          {exp.details.map((d) => (
+            <li key={d} className="text-[15px] md:text-base leading-relaxed text-secondary">{d}</li>
+          ))}
+        </ul>
       </div>
     </div>
   );

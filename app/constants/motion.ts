@@ -16,3 +16,7 @@ export const DUR = {
   slow:   1.0,
   reveal: 1.2,
 } as const;
+
+// One scrub value for every scroll-driven timeline, so each chapter responds
+// to the same scroll with the same lag (Lenis already smooths the input).
+export const SCRUB = 0.6;

@@ -9,11 +9,12 @@ interface PaperShaderProps {
   /**
    * When false the shader's requestAnimationFrame loop is cancelled entirely
    * (ShaderMount treats speed 0 as "stop") and resumes from the same frame when
-   * set back to true. ShaderMount only pauses on document visibilitychange — it
-   * has no IntersectionObserver — so without this it keeps rasterizing millions
-   * of pixels per frame while scrolled far off-screen.
+   * set back to true. ShaderMount only pauses on document visibilitychange.
    */
   active?: boolean;
+  /** Render-resolution caps — a soft gradient looks identical at low res. */
+  minPixelRatio?: number;
+  maxPixelCount?: number;
 }
 
 export function PaperShader({
@@ -21,6 +22,8 @@ export function PaperShader({
   speed = 0.5,
   className = '',
   active = true,
+  minPixelRatio,
+  maxPixelCount,
 }: PaperShaderProps) {
   return (
     <div className={`absolute inset-0 w-full h-full bg-page ${className}`}>
@@ -28,6 +31,8 @@ export function PaperShader({
         className="w-full h-full"
         colors={[...colors]}
         speed={active ? speed : 0}
+        minPixelRatio={minPixelRatio}
+        maxPixelCount={maxPixelCount}
       />
     </div>
   );

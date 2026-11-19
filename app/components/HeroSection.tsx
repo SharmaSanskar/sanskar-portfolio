@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'motion/react';
 import { TextGlitch, type TextGlitchHandle } from './TextGlitch';
-import { PaperShader } from './PaperShader';
 import { RevealText } from './Reveal';
-import { shaderColors } from '@/app/constants/colors';
 import { EASE } from '@/app/constants/motion';
+import { RollText } from './RollText';
+import { CONTACT_EMAIL } from '@/app/constants/site';
 
 const RESUME_URL = 'https://drive.google.com/file/d/1IYAmDrdmkQ3MfcmaABN2AZqZ_DXA_zP4/preview';
 
@@ -17,19 +17,6 @@ const socials = [
   { label: 'LINKEDIN', href: 'https://www.linkedin.com/in/sharma-sanskar/' },
   { label: 'RÉSUMÉ', href: RESUME_URL },
 ];
-
-const MARQUEE_ITEMS = [
-  'Always Shipping',
-  'Zero to Deployed',
-  'Pixel Perfect',
-  'Style Has Opinions',
-  'Curious by Default',
-  'Types Over Prayers',
-];
-const MARQUEE_SET = MARQUEE_ITEMS.flatMap(item => [
-  { type: 'text', value: item },
-  { type: 'sep', value: '·' },
-]);
 
 /** Cursor-follow magnetic pull for CTAs. */
 function Magnetic({ children }: { children: React.ReactNode }) {
@@ -57,71 +44,43 @@ export function HeroSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [roleVisible, setRoleVisible] = useState(false);
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
-  const [isDark, setIsDark] = useState(true);
-  const [shaderActive, setShaderActive] = useState(true);
   const glitchRef = useRef<TextGlitchHandle>(null);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ['start start', 'end start'],
+    // 'end end' = progress 1 exactly when the sticky stage releases, so every
+    // range below maps onto time the stage is actually on screen.
+    offset: ['start start', 'end end'],
   });
 
-  // Vibrant full-bleed shader blooms (scales) to fill on scroll → next-section handoff.
-  const shaderScale = useTransform(scrollYProgress, [0, 0.5], [1, 1.45]);
-
   // Everything except the name fades out almost immediately on scroll.
-  const elemsOpacity = useTransform(scrollYProgress, [0, 0.12], [1, 0]);
+  const elemsOpacity = useTransform(scrollYProgress, [0, 0.08], [1, 0]);
 
-  // The name rises to vertical center (0→0.28), then disintegrates (0.3→0.5):
-  // drifts up, scales, blurs, letters spread apart, and fades.
-  const nameY = useTransform(scrollYProgress, [0, 0.28, 0.5], ['0vh', '-30vh', '-38vh']);
-  const nameScale = useTransform(scrollYProgress, [0.3, 0.5], [1, 1.18]);
-  const nameBlur = useTransform(scrollYProgress, [0.3, 0.5], ['blur(0px)', 'blur(18px)']);
-  // NOTE: a `letterSpacing` 0em→0.4em transform used to live here and was applied
-  // to the name container. It never reached a glyph — letter-spacing is inherited,
-  // and both RevealText children below set `tracking-tight`, which overrides it.
-  // It was a per-frame style invalidation across the subtree for zero pixels.
-  const nameOpacity = useTransform(scrollYProgress, [0.34, 0.5], [1, 0]);
+  // The name rises to vertical center, then disintegrates: drifts up, scales,
+  // blurs and fades.
+  const nameY = useTransform(scrollYProgress, [0, 0.22, 0.4], ['0vh', '-30vh', '-38vh']);
+  const nameScale = useTransform(scrollYProgress, [0.24, 0.4], [1, 1.18]);
+  const nameBlur = useTransform(scrollYProgress, [0.24, 0.4], ['blur(0px)', 'blur(18px)']);
+  const nameOpacity = useTransform(scrollYProgress, [0.28, 0.4], [1, 0]);
 
-  // Description lines (after the name has dissolved)
-  const line1Opacity = useTransform(scrollYProgress, [0.55, 0.62], [0, 1]);
-  const line1Y = useTransform(scrollYProgress, [0.55, 0.62], [50, 0]);
-  const line2Opacity = useTransform(scrollYProgress, [0.63, 0.70], [0, 1]);
-  const line2Y = useTransform(scrollYProgress, [0.63, 0.70], [50, 0]);
-  const line3Opacity = useTransform(scrollYProgress, [0.71, 0.78], [0, 1]);
-  const line3Y = useTransform(scrollYProgress, [0.71, 0.78], [50, 0]);
+  // Description lines arrive one after another once the name has dissolved…
+  const line1Opacity = useTransform(scrollYProgress, [0.44, 0.52], [0, 1]);
+  const line1Y = useTransform(scrollYProgress, [0.44, 0.52], [50, 0]);
+  const line2Opacity = useTransform(scrollYProgress, [0.52, 0.6], [0, 1]);
+  const line2Y = useTransform(scrollYProgress, [0.52, 0.6], [50, 0]);
+  const line3Opacity = useTransform(scrollYProgress, [0.6, 0.68], [0, 1]);
+  const line3Y = useTransform(scrollYProgress, [0.6, 0.68], [50, 0]);
+  // …hold, then lift away together.
+  const linesOut = useTransform(scrollYProgress, [0.72, 0.84], [1, 0]);
+  const linesOutY = useTransform(scrollYProgress, [0.72, 0.84], ['0vh', '-8vh']);
 
-  // Marquee
-  const marqueeOpacity = useTransform(scrollYProgress, [0.82, 0.92], [0, 1]);
-  const marqueeY = useTransform(scrollYProgress, [0.82, 0.92], [24, 0]);
-  // Its backdrop-filter blurs the live WebGL canvas every frame even at opacity
-  // 0. It is invisible until 0.82, so hide it outright until then.
-  const marqueeVisibility = useTransform(marqueeOpacity, (o) => (o === 0 ? 'hidden' : 'visible'));
-
-  useEffect(() => {
-    const update = () => setIsDark(document.documentElement.dataset.theme !== 'light');
-    update();
-    const observer = new MutationObserver(update);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-    return () => observer.disconnect();
-  }, []);
+  // Handoff: the hero's words dissolve; the gradient behind them (Backdrop)
+  // keeps going, so the next chapter rises out of the same surface.
+  const stageOpacity = useTransform(scrollYProgress, [0.74, 0.9], [1, 0]);
 
   useEffect(() => {
     const t = setTimeout(() => setRoleVisible(true), 1400);
     return () => clearTimeout(t);
-  }, []);
-
-  // Stop the WebGL loop once the hero is fully scrolled past — it is invisible
-  // there, but ShaderMount would otherwise keep rendering for the whole page.
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setShaderActive(entry.isIntersecting),
-      { rootMargin: '200px' }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -137,30 +96,17 @@ export function HeroSection() {
   const nameStyle = { fontSize: 'clamp(3rem, 12vw, 13rem)', lineHeight: 0.92 } as const;
 
   return (
-    <section ref={sectionRef} className="relative h-[500vh] bg-page">
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
+    <section ref={sectionRef} className="relative h-[300vh] md:h-[400vh]">
+      <motion.div
+        style={{ opacity: stageOpacity }}
+        className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center"
+      >
 
-        {/* ── z0: vibrant full-bleed shader ── */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1.4, ease: EASE.out }}
-          className="absolute inset-0 z-0"
-        >
-          <motion.div style={{ scale: shaderScale }} className="w-full h-full">
-            <PaperShader colors={isDark ? shaderColors.dark : shaderColors.light} speed={0.32} active={shaderActive} />
-          </motion.div>
-        </motion.div>
-
-        {/* ── z1: edge scrims (top + bottom) — center shader stays vibrant ── */}
-        <div
-          className="absolute inset-0 z-[1] pointer-events-none"
-          style={{ background: 'linear-gradient(to bottom, var(--color-page) 0%, transparent 24%, transparent 52%, var(--color-page) 100%)' }}
-          aria-hidden="true"
-        />
+        {/* The gradient itself lives in the page-wide <Backdrop />, so it
+            carries on unbroken into the next chapter. */}
 
         {/* ── z10: foreground ── */}
-        <div className="absolute inset-0 z-10 flex flex-col px-8 md:px-12 py-9 md:py-10 pointer-events-none">
+        <div className="absolute inset-0 z-10 flex flex-col px-gutter py-9 md:py-10 pointer-events-none">
           {/* Top row — quote (left) + rotating role (right) — fades on scroll */}
           <motion.div style={{ opacity: elemsOpacity }} className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between md:gap-6">
             <motion.p
@@ -178,12 +124,8 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5, ease: EASE.out }}
-              className="flex items-center gap-2.5 flex-shrink-0"
+              className="flex items-center flex-shrink-0"
             >
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-accent opacity-75 animate-ping" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
-              </span>
               <TextGlitch
                 ref={glitchRef}
                 as="span"
@@ -251,7 +193,7 @@ export function HeroSection() {
                     rel="noreferrer"
                     className="type-label text-secondary hover:text-accent transition-colors duration-200 link-underline"
                   >
-                    {s.label}
+                    <RollText>{s.label}</RollText>
                   </a>
                   {i < socials.length - 1 && <span className="text-dim text-xs select-none">/</span>}
                 </span>
@@ -261,10 +203,10 @@ export function HeroSection() {
             {/* primary CTA */}
             <Magnetic>
               <a
-                href="mailto:sharma.sans@northeastern.edu"
+                href={`mailto:${CONTACT_EMAIL}`}
                 className="block px-6 py-3 type-label bg-accent text-on-accent transition-[background-color,box-shadow] duration-300 hover:bg-accent-hover hover:shadow-[0_10px_36px_var(--color-accent-glow)]"
               >
-                GET IN TOUCH
+                <RollText>GET IN TOUCH</RollText>
               </a>
             </Magnetic>
           </motion.div>
@@ -272,8 +214,11 @@ export function HeroSection() {
         </div>
 
         {/* ── Description lines (after the name dissolves) ── */}
-        <div className="absolute left-6 md:left-12 top-1/2 -translate-y-1/2 max-w-[88vw] md:max-w-4xl z-20 pointer-events-none">
-          <div className="flex flex-col items-start text-left gap-8">
+        <motion.div
+          style={{ opacity: linesOut, y: linesOutY }}
+          className="absolute inset-x-0 top-1/2 -translate-y-1/2 px-gutter z-20 pointer-events-none"
+        >
+          <div className="flex flex-col items-start text-left gap-6 md:gap-10 max-w-4xl">
             <div className="overflow-hidden">
               <motion.p style={{ y: line1Y, opacity: line1Opacity }} className="text-3xl md:text-5xl lg:text-6xl type-statement text-heading">
                 I turn ideas into interfaces people love using.
@@ -290,51 +235,9 @@ export function HeroSection() {
               </motion.p>
             </div>
           </div>
-        </div>
-
-        {/* ── Marquee (scroll 74–86%) ── */}
-        <motion.div
-          style={{
-            opacity: marqueeOpacity,
-            y: marqueeY,
-            visibility: marqueeVisibility,
-            background: 'var(--color-glass)',
-            backdropFilter: 'blur(15px)',
-            WebkitBackdropFilter: 'blur(15px)',
-            borderColor: 'var(--color-glass-border)',
-          }}
-          className="absolute bottom-0 left-0 right-0 z-30 overflow-hidden py-5 border-t"
-          aria-hidden="true"
-        >
-          {/* `.marquee-run` in globals.css has identical keyframes, duration and
-              easing, but runs on the compositor. As a JS animation this ticked on
-              the main thread for the whole session, including ~900vh after the
-              hero had left the screen. */}
-          <div
-            className="flex items-center marquee-run"
-            style={{ width: 'max-content' }}
-          >
-            {[0, 1].map(set => (
-              <div key={set} className="flex items-center gap-8 pr-8 flex-shrink-0">
-                {MARQUEE_SET.map((item, i) =>
-                  item.type === 'sep' ? (
-                    <span key={`${set}-sep-${i}`} className="text-accent flex-shrink-0 text-base select-none">·</span>
-                  ) : (
-                    <span
-                      key={`${set}-${i}`}
-                      className="flex-shrink-0 text-heading font-semibold uppercase select-none"
-                      style={{ fontSize: '13px', letterSpacing: '0.25em' }}
-                    >
-                      {item.value}
-                    </span>
-                  )
-                )}
-              </div>
-            ))}
-          </div>
         </motion.div>
 
-      </div>
+      </motion.div>
     </section>
   );
 }
