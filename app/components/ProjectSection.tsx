@@ -29,12 +29,12 @@ const projects: Project[] = [
   {
     title: 'Mosaic',
     date: '08 2026',
-    summary: 'A live multiplayer workspace where people and an AI agent think together on one shared canvas.',
+    summary: 'A live multiplayer workspace where people and multiple AI agents think together in one shared room.',
     description: [
-      'Built a real-time collaborative workspace where multiple users and an LLM agent share a live room.',
-      'Engineered a lock-free Go WebSocket hub using one goroutine per room, streaming AI replies to all clients.',
-      'Generated a self-updating reasoning DAG from chat context, rendered live with React Flow in a 3-pane UI.',
-      'Cut per-user socket connections 75% via shared React Context; added JWT auth, rate limiting, token metrics.',
+      'Built a real-time workspace where multiple users and several AI agents collaborate in one room — chat, an AI-authored diagram, and a shared moodboard of decisions.',
+      'Engineered a lock-free Go WebSocket hub (one goroutine per room) streaming several agents’ replies concurrently, and cut per-user socket connections 75% via a shared client context.',
+      'Designed a provider-agnostic model layer (OpenAI / Anthropic / Google) with encrypted bring-your-own-API-keys (AES-256-GCM).',
+      'Generated context-aware visualizations where the AI picks and renders the fitting Mermaid diagram live; shipped presence, typing, JWT auth, rate limiting, and membership-scoped RLS.',
     ],
     tech: ['Go', 'Next.js', 'WebSockets', 'Supabase'],
     githubUrl: 'https://github.com/SharmaSanskar/mosaic-ai',
